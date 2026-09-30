@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="stlyer/stlye.css">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">
+            <!-- <img src="" alt=""> -->
+            <h2>logo
+            </h2>
+        </div>
+        <div class="page_bar">
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Rooms</a></li>
+                <li><a href="#">Offers</a></li>
+                <li><a href="#">Location</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+            <button class="btn">BOOK NOW</button>
+        </div>
+    </nav>
+    <section>
+        <div class="photo">
+            <img src="" alt=""> <!--ดึงจากdata base-->
+        </div>
+    </section>
+    <div class="search_bar">
+        <form class="search_bar_container">
+            <div class="checkIn">
+                <label for="date">เช็คอิน</label>
+                <input type="date" id="date">
+            </div>
+            <div class="checkOut">
+                <label for="date">เช็คเอาท์</label>
+                <input type="date" id="date">
+            </div>
+            <div class="guest">
+                <label for="number">ผู้เข้าพัก (Guests)</label>
+                <input type="number" id="number" min="1" max="10" value="1">
+            </div>
+            <button type="submit">ค้นหาห้องพัก</button>
+        </form>
+    </div>
+    <div class="promotion">
+        <p>โปรโมชั่น</p>
+    </div>
+    <main class="main_container">
+        <div class="text">
+            <h2>ห้องพักของเรา</h2>
+            <p>OUR ROOMS</p>
+        </div>
+        <div class="card_container">
+            <!-- ส่วนนี้loop เพื่อเอาข้อมูลมาแสดง -->
+            <div class="card">
+                <img src="" alt="">
+                <div class="card-content">
+                    <h3>text</h3>
+                    <p>text</p>
+                </div>
+            </div>
+            <!-- จบloop -->
+        </div>
+        <div class="room">
+            <!-- ส่วนนี้loop เพื่อเอาข้อมูลมาแสดง -->
+            <div class="card">
+                <img src="" alt="">
+                <div class="card-content">
+                    <h3>text</h3>
+                    <p>text</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="" alt="">
+                <div class="card-content">
+                    <h3></h3>
+                    <p></p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="" alt="">
+                <div class="card-content">
+                    <h3></h3>
+                    <p></p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="" alt="">
+                <div class="card-content">
+                    <h3></h3>
+                    <p></p>
+                </div>
+            </div>
+            <!-- จบloop -->
+        </div>
+    </main>
+    <footer>
+        <h2>Azure resort</h2>
+    </footer>
+</body>
+
+</html>

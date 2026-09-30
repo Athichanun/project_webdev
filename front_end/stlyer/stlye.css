@@ -1,0 +1,150 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Sarabun', sans-serif;
+}
+
+nav {
+    background-color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    background-color: rgb(255, 255, 255);
+}
+
+.page_bar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li a {
+    margin-left: 20px;
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.page_bar .btn {
+    background-color: #14a2e4;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+    color: white;
+}
+
+section {
+    background-color: #14a2e4;
+    height: 500px;
+}
+
+.search_bar {
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search_bar_container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* border: 1px solid black; */
+    gap: 20px;
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    cursor: pointer;
+    position: relative;
+    margin-top: -30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.1);
+}
+
+.checkIn,
+.checkOut,
+.guest {
+    display: grid;
+}
+
+
+.search_bar_container button {
+    background-color: #14a2e4;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    color: white;
+}
+
+.promotion {
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #14a2e4;
+    color: white;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.text {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.card_container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    width: 100%;
+    min-height: 200px;
+    border: 1px solid black;
+}
+
+.room {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 85%;
+    padding: 10px;
+}
+
+footer {
+    background-color: #14a2e4;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
