@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms - Azure Resort</title>
+    <link rel="stylesheet" href="stlyer/stlye.css">
+    <link rel="stylesheet" href="stlyer/rooms.css">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">
+            <h2>logo</h2>
+        </div>
+        <div class="page_bar">
+            <ul class="nav-links">
+                <li><a href="main.html">Home</a></li>
+                <li><a href="rooms.html" class="active">Rooms</a></li>
+                <li><a href="offers.html">Offers</a></li>
+                <li><a href="location.html">Location</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+            <button class="btn">BOOK NOW</button>
+        </div>
+    </nav>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+        <div class="hero-overlay">
+            <h1>ห้องพักของเรา</h1>
+            <p>OUR ROOMS</p>
+        </div>
+    </section>
+
+    <!-- Filter & Sort Bar -->
+    <div class="filter-bar">
+        <div class="filter-container">
+            <div class="filter-item">
+                <label for="room-type">ประเภทห้อง</label>
+                <select id="room-type">
+                    <option value="all">ทั้งหมด</option>
+                    <option value="standard">Standard</option>
+                    <option value="deluxe">Deluxe</option>
+                    <option value="suite">Suite</option>
+                    <option value="villa">Villa</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="price-range">ช่วงราคา</label>
+                <select id="price-range">
+                    <option value="all">ทั้งหมด</option>
+                    <option value="0-2000">ต่ำกว่า 2,000 ฿</option>
+                    <option value="2000-5000">2,000 - 5,000 ฿</option>
+                    <option value="5000+">มากกว่า 5,000 ฿</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="guests">จำนวนผู้เข้าพัก</label>
+                <select id="guests">
+                    <option value="all">ทั้งหมด</option>
+                    <option value="1-2">1 - 2 คน</option>
+                    <option value="3-4">3 - 4 คน</option>
+                    <option value="5+">5 คนขึ้นไป</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="sort-by">เรียงตาม</label>
+                <select id="sort-by">
+                    <option value="default">ค่าเริ่มต้น</option>
+                    <option value="price_asc">ราคา: ต่ำ → สูง</option>
+                    <option value="price_desc">ราคา: สูง → ต่ำ</option>
+                    <option value="name_asc">ชื่อ: ก → ฮ</option>
+                    <option value="name_desc">ชื่อ: ฮ → ก</option>
+                    <option value="guests_desc">ผู้เข้าพัก: มาก → น้อย</option>
+                </select>
+            </div>
+            <button class="filter-btn" id="filter-btn">ค้นหา</button>
+        </div>
+    </div>
+
+    <!-- Room Cards (โหลดจาก PHP) -->
+    <main class="rooms-main">
+        <div class="rooms-result-info">
+            <span id="result-count">กำลังโหลด...</span>
+        </div>
+        <div class="rooms-grid" id="rooms-grid">
+            <!-- ห้องพักจะถูกโหลดจาก PHP ผ่าน JavaScript -->
+        </div>
+    </main>
+
+    <footer>
+        <h2>Azure resort</h2>
+    </footer>
+
+    <script>
+        // ฟังก์ชั่นหลัก: ดึงข้อมูลห้องพักจาก PHP
+        function fetchRooms() {
+            const roomType = document.getElementById('room-type').value;
+            const priceRange = document.getElementById('price-range').value;
+            const guests = document.getElementById('guests').value;
+            const sortBy = document.getElementById('sort-by').value;
+
+            const params = new URLSearchParams({
+                room_type: roomType,
+                price_range: priceRange,
+                guests: guests,
+                sort_by: sortBy
+            });
+
+            const url = `../script/rooms.php?${params.toString()}`;
+
+            document.getElementById('result-count').textContent = 'กำลังโหลด...';
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        renderRooms(data.data);
+                        document.getElementById('result-count').textContent =
+                            `พบ ${data.count} ห้องพัก`;
+                    } else {
+                        document.getElementById('rooms-grid').innerHTML =
+                            '<p class="no-rooms">ไม่สามารถโหลดข้อมูลได้</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('rooms-grid').innerHTML =
+                        '<p class="no-rooms">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
+                    document.getElementById('result-count').textContent = '';
+                });
+        }
+
+        // ฟังก์ชั่น render การ์ดห้องพัก
+        function renderRooms(rooms) {
+            const grid = document.getElementById('rooms-grid');
+
+            if (rooms.length === 0) {
+                grid.innerHTML = '<p class="no-rooms">ไม่พบห้องพักที่ตรงกับเงื่อนไข</p>';
+                return;
+            }
+
+            let html = '';
+            rooms.forEach(room => {
+                const price = Number(room.price).toLocaleString();
+                const badgeHtml = room.badge
+                    ? `<span class="room-badge">${room.badge}</span>`
+                    : '';
+                const imgSrc = room.image_url || '';
+
+                html += `
+                <div class="room-card">
+                    <div class="room-img">
+                        <img src="${imgSrc}" alt="${room.room_name}">
+                        ${badgeHtml}
+                    </div>
+                    <div class="room-info">
+                        <h3>${room.room_name}</h3>
+                        <p class="room-desc">${room.description || ''}</p>
+                        <div class="room-amenities">
+                            <span>🛏️ ${room.bed_type || ''}</span>
+                            <span>👥 ${room.max_guests} ท่าน</span>
+                            <span>📐 ${room.room_size || ''} ตร.ม.</span>
+                        </div>
+                        <div class="room-footer">
+                            <div class="room-price">
+                                <span class="price">${price} ฿</span>
+                                <span class="per-night">/ คืน</span>
+                            </div>
+                            <button class="book-btn">จองห้องพัก</button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        // Event listeners
+        document.getElementById('filter-btn').addEventListener('click', fetchRooms);
+
+        // กด Enter ใน filter ก็ค้นหาได้
+        document.querySelectorAll('.filter-container select').forEach(select => {
+            select.addEventListener('change', fetchRooms);
+        });
+
+        // โหลดข้อมูลเมื่อเปิดหน้าเว็บ
+        document.addEventListener('DOMContentLoaded', fetchRooms);
+    </script>
+</body>
+
+</html>
