@@ -169,13 +169,26 @@
                                 <span class="price">${price} ฿</span>
                                 <span class="per-night">/ คืน</span>
                             </div>
-                            <button class="book-btn">จองห้องพัก</button>
+                            ${room.is_reserved == 1 
+                                ? `<button class="book-btn" style="background-color: #ccc; cursor: not-allowed;" disabled>จองแล้ว</button>` 
+                                : `<button class="book-btn" onclick="goToBookingPage(${room.room_id}, '${room.room_name}', ${room.price})">จองห้องพัก</button>`
+                            }
                         </div>
                     </div>
                 </div>`;
             });
 
             grid.innerHTML = html;
+        }
+
+                // ฟังก์ชันจัดการเมื่อลูกค้ากดปุ่ม "จองห้องพัก"
+            function goToBookingPage(roomId, roomName, price) {
+                const params = new URLSearchParams({
+                room_id: roomId,
+                room_name: roomName,
+                price: price
+            });
+            window.location.href = `booking.html?${params.toString()}`;
         }
 
         // Event listeners
@@ -188,6 +201,8 @@
 
         // โหลดข้อมูลเมื่อเปิดหน้าเว็บ
         document.addEventListener('DOMContentLoaded', fetchRooms);
+
+
     </script>
 </body>
 

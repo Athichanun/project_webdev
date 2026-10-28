@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ยืนยันการจองและชำระเงิน - Azure Resort</title>
+    <link rel="stylesheet" href="stlyer/stlye.css">
+    <link rel="stylesheet" href="stlyer/booking.css">
+</head>
+<body>
+    <nav>
+        <div class="logo"><h2>logo</h2></div>
+        <div class="page_bar">
+            <ul class="nav-links">
+                <li><a href="main.html">Home</a></li>
+                <li><a href="rooms.html" class="active">Rooms</a></li>
+                <li><a href="offers.html">Offers</a></li>
+                <li><a href="location.html">Location</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="booking-container">
+        <!-- ฟอร์มกรอกข้อมูลลูกค้าและชำระเงิน -->
+        <div class="form-card">
+            <h2>ข้อมูลผู้เข้าพักและการชำระเงิน</h2>
+            <form id="booking-form">
+                <input type="hidden" id="room-id" name="room_id">
+                
+                <div class="form-group">
+                    <label for="cus-name">ชื่อ - นามสกุล ผู้เข้าพัก *</label>
+                    <input type="text" id="cus-name" name="cus_name" placeholder="เช่น สมชาย ใจดี" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">เบอร์โทรศัพท์ *</label>
+                    <input type="tel" id="phone" name="phone" placeholder="08X-XXX-XXXX" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">อีเมล *</label>
+                    <input type="email" id="email" name="email" placeholder="example@email.com" required>
+                </div>
+
+                <div class="date-row">
+                    <div class="form-group">
+                        <label for="check-in">วันที่เช็คอิน *</label>
+                        <input type="date" id="check-in" name="check_in" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="check-out">วันที่เช็คเอาท์ *</label>
+                        <input type="date" id="check-out" name="check_out" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-method">วิธีการชำระเงิน *</label>
+                    <select id="payment-method" name="payment_method" onchange="togglePaymentBox()">
+                        <option value="Paid">สแกน QR PromptPay (ชำระทันที)</option>
+                        <option value="Paid_Card">บัตรเครดิต / เดบิต (ชำระทันที)</option>
+                        <option value="Waiting">ชำระเงินที่เคาน์เตอร์โรงแรม (รอชำระ)</option>
+                    </select>
+                </div>
+
+                <div id="payment-detail-box" class="qr-box">
+                    <p style="margin-bottom:8px; font-weight:bold;">สแกน QR Code เพื่อชำระเงิน</p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=AzureResortPromptPay" alt="QR Code">
+                    <p style="font-size:13px; color:#666; margin-top:8px;">ชื่อบัญชี: บจก. อะซูร์ รีสอร์ท</p>
+                </div>
+
+                <button type="submit" class="submit-pay-btn">ยืนยันการจองและชำระเงิน</button>
+            </form>
+        </div>
+
+        <!-- การ์ดสรุปรายการจอง -->
+        <div class="summary-card">
+            <h3>สรุปรายการจอง</h3>
+            <div class="summary-item">
+                <span>ห้องพักที่เลือก:</span>
+                <strong id="display-room-name">-</strong>
+            </div>
+            <div class="summary-item">
+                <span>ราคาต่อคืน:</span>
+                <span id="display-price">0 ฿</span>
+            </div>
+            <div class="summary-item">
+                <span>จำนวนคืนที่พัก:</span>
+                <span id="display-nights">1 คืน</span>
+            </div>
+            <div class="summary-item total-price">
+                <span>ยอดชำระสุทธิ:</span>
+                <span id="display-total">0 ฿</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ดึงข้อมูลห้องพักจาก URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('room_id');
+        const roomName = urlParams.get('room_name') || 'ไม่ระบุห้องพัก';
+        const pricePerNight = Number(urlParams.get('price')) || 0;
+
+        document.getElementById('room-id').value = roomId;
+        document.getElementById('display-room-name').textContent = roomName;
+        document.getElementById('display-price').textContent = pricePerNight.toLocaleString() + ' ฿';
+
+        // ตั้งค่าวันที่เริ่มต้น (วันนี้ และ พรุ่งนี้)
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const checkInInput = document.getElementById('check-in');
+        const checkOutInput = document.getElementById('check-out');
+        checkInInput.value = today.toISOString().split('T')[0];
+        checkOutInput.value = tomorrow.toISOString().split('T')[0];
+
+        // ฟังก์ชันคำนวณจำนวนคืนและราคารวมแบบ Real-time
+        function calculateTotal() {
+            const d1 = new Date(checkInInput.value);
+            const d2 = new Date(checkOutInput.value);
+            const diffTime = d2 - d1;
+            const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (nights > 0) {
+                document.getElementById('display-nights').textContent = nights + ' คืน';
+                document.getElementById('display-total').textContent = (nights * pricePerNight).toLocaleString() + ' ฿';
+            } else {
+                document.getElementById('display-nights').textContent = 'วันที่ไม่ถูกต้อง';
+                document.getElementById('display-total').textContent = '0 ฿';
+            }
+        }
+
+        checkInInput.addEventListener('change', calculateTotal);
+        checkOutInput.addEventListener('change', calculateTotal);
+        calculateTotal();
+
+        // สลับการแสดงผลช่องชำระเงิน
+        function togglePaymentBox() {
+            const method = document.getElementById('payment-method').value;
+            const box = document.getElementById('payment-detail-box');
+            if (method === 'Paid') {
+                box.style.display = 'block';
+                box.innerHTML = `
+                    <p style="margin-bottom:8px; font-weight:bold;">สแกน QR Code เพื่อชำระเงิน</p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=AzureResortPromptPay" alt="QR Code">
+                    <p style="font-size:13px; color:#666; margin-top:8px;">ชื่อบัญชี: บจก. อะซูร์ รีสอร์ท</p>`;
+            } else if (method === 'Paid_Card') {
+                box.style.display = 'block';
+                box.innerHTML = `
+                    <div class="form-group" style="text-align:left;">
+                        <label>หมายเลขบัตรเครดิต/เดบิต</label>
+                        <input type="text" placeholder="XXXX-XXXX-XXXX-XXXX" required>
+                    </div>`;
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        // ส่งข้อมูลไปยัง submitBooking.php เมื่อกดปุ่มยืนยัน
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('../script/submitBooking.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`🎉 จองและทำรายการสำเร็จ!\nรหัสการจอง: #${data.booking_id}\nสถานะการชำระเงิน: ${data.payment_status}\nยอดรวมทั้งสิ้น: ${Number(data.total_price).toLocaleString()} บาท`);
+                    window.location.href = 'rooms.html'; // เด้งกลับไปหน้ารวมห้องพัก
+                } else {
+                    alert('❌ เกิดข้อผิดพลาด: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+            });
+        });
+    </script>
+</body>
+</html>
