@@ -48,26 +48,50 @@ try {
     if ($nights <= 0) {
         throw new Exception("วันที่เช็คเอาท์ต้องมากกว่าวันที่เช็คอินอย่างน้อย 1 วัน");
     }
-    $totalPrice = $nights * $room['price'];
 
-    // 3. จัดการข้อมูลลูกค้าในตาราง Customer (ถ้ามีอีเมลหรือเบอร์นี้แล้วให้ใช้ cus_id เดิม ถ้ายังไม่มีให้เพิ่มใหม่)
-    $stmtCheckCus = $pdo->prepare("SELECT cus_id FROM Customer WHERE email = ? OR phone = ? LIMIT 1");
-    $stmtCheckCus->execute([$email, $phone]);
-    $existingCus = $stmtCheckCus->fetch(PDO::FETCH_ASSOC);
+    // 3. จัดการข้อมูลลูกค้าในตาราง Customer
+    $loggedInCusId = isset($_COOKIE['memberId']) ? (int)$_COOKIE['memberId'] : null;
+    $isMember = !empty($loggedInCusId) || (isset($_POST['is_member']) && $_POST['is_member'] == '1');
 
-    if ($existingCus) {
-        $cusId = $existingCus['cus_id'];
+    // ถ้าล็อกอินแล้ว ให้ลดราคาห้องพักทั้งหมด 15% จากราคาเดิมในฐานข้อมูล
+    $unitPrice = (float)$room['price'];
+    if ($isMember) {
+        $unitPrice = round($unitPrice * 0.85, 2);
+    }
+    $totalPrice = $nights * $unitPrice;
+
+    if ($loggedInCusId) {
+        $cusId = $loggedInCusId;
+        // อัปเดตข้อมูลลูกค้าที่ล็อกอินอยู่
+        $stmtUpdateCus = $pdo->prepare("UPDATE Customer SET cus_name = ?, phone = ?, email = ? WHERE cus_id = ?");
+        $stmtUpdateCus->execute([$cusName, $phone, $email, $cusId]);
     } else {
-        $stmtInsertCus = $pdo->prepare("INSERT INTO Customer (cus_name, phone, email, is_member) VALUES (?, ?, ?, 0)");
-        $stmtInsertCus->execute([$cusName, $phone, $email]);
-        $cusId = $pdo->lastInsertId();
+        $stmtCheckCus = $pdo->prepare("SELECT cus_id FROM Customer WHERE email = ? OR phone = ? LIMIT 1");
+        $stmtCheckCus->execute([$email, $phone]);
+        $existingCus = $stmtCheckCus->fetch(PDO::FETCH_ASSOC);
+
+        if ($existingCus) {
+            $cusId = $existingCus['cus_id'];
+        } else {
+            $stmtInsertCus = $pdo->prepare("INSERT INTO Customer (cus_name, phone, email, is_member) VALUES (?, ?, ?, 0)");
+            $stmtInsertCus->execute([$cusName, $phone, $email]);
+            $cusId = $pdo->lastInsertId();
+        }
     }
 
-    // 4. บันทึกการจองลงตาราง Booking
-    $sqlBooking = "INSERT INTO Booking (cus_id, room_id, check_in, check_out, total_price, payment_status) VALUES (?, ?, ?, ?, ?, ?)";
-    $stmtBooking = $pdo->prepare($sqlBooking);
-    $stmtBooking->execute([$cusId, $roomId, $checkIn, $checkOut, $totalPrice, $paymentStatus]);
-    $bookingId = $pdo->lastInsertId();
+    // 4. บันทึกการจองลงตาราง Booking (รวม cus_name, phone, email)
+    try {
+        $sqlBooking = "INSERT INTO Booking (cus_id, cus_name, phone, email, room_id, check_in, check_out, total_price, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmtBooking = $pdo->prepare($sqlBooking);
+        $stmtBooking->execute([$cusId, $cusName, $phone, $email, $roomId, $checkIn, $checkOut, $totalPrice, $paymentStatus]);
+        $bookingId = $pdo->lastInsertId();
+    } catch (PDOException $e) {
+        // กรณีตาราง Booking ยังไม่ได้รันคำสั่งเพิ่มคอลัมน์ cus_name, phone, email
+        $sqlBooking = "INSERT INTO Booking (cus_id, room_id, check_in, check_out, total_price, payment_status) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmtBooking = $pdo->prepare($sqlBooking);
+        $stmtBooking->execute([$cusId, $roomId, $checkIn, $checkOut, $totalPrice, $paymentStatus]);
+        $bookingId = $pdo->lastInsertId();
+    }
 
     // 5. บันทึกประวัติลงตาราง History
     $currentDate = date('Y-m-d H:i:s');

@@ -40,10 +40,27 @@ try {
     $stmt->execute($params);
     $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // ตรวจสอบสถานะการล็อกอินเพื่อคำนวณส่วนลดสมาชิก 15%
+    $isLoggedIn = !empty($_COOKIE['memberId']) || (isset($_GET['is_member']) && $_GET['is_member'] == '1');
+    foreach ($rooms as &$room) {
+        $rawPrice = (float)$room['price'];
+        $room['original_price'] = $rawPrice;
+        if ($isLoggedIn) {
+            $room['price'] = round($rawPrice * 0.85, 2);
+            $room['is_member_discount'] = true;
+            $room['discount_percent'] = 15;
+        } else {
+            $room['is_member_discount'] = false;
+            $room['discount_percent'] = 0;
+        }
+    }
+    unset($room);
+
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode([
         'success' => true,
         'count' => count($rooms),
+        'is_member' => $isLoggedIn,
         'filters' => [
             'check_in' => $checkIn,
             'check_out' => $checkOut,

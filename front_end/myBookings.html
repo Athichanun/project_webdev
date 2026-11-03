@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายการจองของฉัน - Azure Resort</title>
+    <link rel="stylesheet" href="stlyer/stlye.css">
+    <link rel="stylesheet" href="stlyer/myBookings.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">
+            <h2>logo</h2>
+        </div>
+        <div class="page_bar">
+            <ul class="nav-links">
+                <li><a href="main.html">Home</a></li>
+                <li><a href="rooms.html">Rooms</a></li>
+                <li><a href="offers.html">Offers</a></li>
+                <li><a href="location.html">Location</a></li>
+            </ul>
+            <div class="auth-action" id="nav-auth-section">
+                <button class="btn auth-btn" onclick="window.location.href='logIn.html'">LOGIN</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bookings-page">
+        <!-- Hero Banner -->
+        <section class="bookings-hero">
+            <h1>รายการจองห้องพักของฉัน</h1>
+            <p>MY BOOKINGS & RESERVATIONS</p>
+        </section>
+
+        <!-- Main Content -->
+        <div class="bookings-container">
+            <!-- ข้อมูลผู้ใช้งาน -->
+            <div class="user-card">
+                <div class="user-card-left">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" 
+                         alt="User Profile" 
+                         class="user-card-avatar"
+                         onerror="this.onerror=null; this.src='user-avatar.svg';">
+                    <div class="user-card-info">
+                        <h2 id="user-display-name">ผู้ใช้งาน</h2>
+                        <p id="user-display-email">กำลังโหลดข้อมูล...</p>
+                    </div>
+                </div>
+                <div class="user-card-badge">
+                    ⭐ สมาชิก Azure Resort
+                </div>
+            </div>
+
+            <!-- แถบเลือกสถานะ (Tabs) -->
+            <div class="tabs-container">
+                <button class="tab-btn active" id="tab-waiting" onclick="switchTab('Waiting')">
+                    ⏳ กำลังรอเข้าใช้งาน (Waiting)
+                    <span class="tab-count" id="count-waiting">0</span>
+                </button>
+                <button class="tab-btn" id="tab-all" onclick="switchTab('all')">
+                    📋 ประวัติการจองทั้งหมด
+                    <span class="tab-count" id="count-all">0</span>
+                </button>
+            </div>
+
+            <!-- รายการการจอง -->
+            <div class="bookings-list" id="bookings-list">
+                <!-- โหลดการ์ดการจองผ่าน JavaScript -->
+                <p style="text-align: center; color: #64748b; padding: 40px;">กำลังโหลดรายการจองของคุณ...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h2>Azure Resort</h2>
+                <p>สัมผัสประสบการณ์การพักผ่อนริมทะเลระดับพรีเมียม บรรยากาศเงียบสงบ พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
+                <div class="footer-social">
+                    <a href="#">📘 Facebook</a>
+                    <a href="#">📸 Instagram</a>
+                    <a href="#">🐦 Twitter</a>
+                    <a href="#">📺 YouTube</a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h3>ข้อมูลติดต่อ</h3>
+                <ul class="footer-contact-list">
+                    <li><span class="icon">📍</span> 123/456 ถนนชายหาด ตำบลหาดสวย<br>อำเภอเมือง จังหวัดชลบุรี 20000</li>
+                    <li><span class="icon">📞</span> โทรศัพท์: 038-XXX-XXX</li>
+                    <li><span class="icon">📧</span> อีเมล: info@azureresort.com</li>
+                    <li><span class="icon">💬</span> Line Official: @azureresort</li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>เวลาทำการ</h3>
+                <ul class="footer-hours-list">
+                    <li><span>เคาน์เตอร์ต้อนรับ:</span> <strong>24 ชั่วโมง</strong></li>
+                    <li><span>สำนักงาน:</span> <strong>08:00 - 20:00</strong></li>
+                    <li><span>ห้องอาหาร:</span> <strong>06:30 - 22:00</strong></li>
+                    <li><span>สระว่ายน้ำ:</span> <strong>06:00 - 20:00</strong></li>
+                    <li><span>สปา:</span> <strong>10:00 - 21:00</strong></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>เมนูลัด</h3>
+                <ul class="footer-links">
+                    <li><a href="main.html">หน้าแรก (Home)</a></li>
+                    <li><a href="rooms.html">ห้องพักของเรา (Rooms)</a></li>
+                    <li><a href="offers.html">โปรโมชั่นและข้อเสนอ (Offers)</a></li>
+                    <li><a href="location.html">การเดินทางและแผนที่ (Location)</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 Azure Resort. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ฟังก์ชันอ่านค่าผู้ใช้ (รองรับทั้ง Cookie และ LocalStorage เมื่อเปิดไฟล์ HTML ตรงๆ)
+        function getAuthData(key) {
+            const nameEQ = key + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i].trim();
+                if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length));
+            }
+            try { return localStorage.getItem(key); } catch (e) { return null; }
+        }
+
+        function clearAuthData() {
+            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user'];
+            keys.forEach(k => {
+                document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                try { localStorage.removeItem(k); } catch (e) {}
+            });
+        }
+
+        // ตรวจสอบคุกกี้ใน Navbar
+        function updateNavAuth() {
+            const memberId = getAuthData('memberId');
+            const username = getAuthData('username');
+            const authSection = document.getElementById('nav-auth-section');
+
+            if (authSection && (memberId || username)) {
+                const displayName = username || 'User';
+                authSection.innerHTML = `
+                    <div class="user-profile-menu">
+                        <a href="myBookings.html" class="profile-avatar-link" title="ดูรายการจองของฉัน (${displayName})">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" 
+                                 alt="User Profile" 
+                                 class="user-avatar" 
+                                 onerror="this.onerror=null; this.src='user-avatar.svg';">
+                        </a>
+                        <div id="profile-dropdown" class="profile-dropdown">
+                            <div class="dropdown-header">
+                                <strong>${displayName}</strong>
+                            </div>
+                            <a href="myBookings.html" class="dropdown-item" style="color: #14a2e4; font-weight: bold;">📋 รายการจองของฉัน (Waiting)</a>
+                            <a href="javascript:void(0)" class="dropdown-item logout-link" id="logout-btn">ออกจากระบบ (Logout)</a>
+                        </div>
+                    </div>
+                `;
+
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        clearAuthData();
+                        fetch('../script/logout.php').catch(() => {}).finally(() => {
+                            window.location.href = 'main.html';
+                        });
+                    });
+                }
+            } else if (authSection) {
+                authSection.innerHTML = `<button class="btn auth-btn" onclick="window.location.href='logIn.html'">LOGIN</button>`;
+            }
+        }
+
+        let currentTab = 'Waiting';
+
+        // สลับแท็บตัวกรอง
+        function switchTab(status) {
+            currentTab = status;
+            document.getElementById('tab-waiting').classList.toggle('active', status === 'Waiting');
+            document.getElementById('tab-all').classList.toggle('active', status === 'all');
+            fetchBookings(status);
+        }
+
+        // ดึงข้อมูลรายการจอง
+        function fetchBookings(status) {
+            const container = document.getElementById('bookings-list');
+            container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 40px;">กำลังโหลดรายการจอง...</p>';
+
+            fetch(`../script/getMyBookings.php?status=${status}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data && data.data.length > 0) {
+                        renderBookings(data.data, status);
+                        if (status === 'Waiting') {
+                            document.getElementById('count-waiting').textContent = data.count || data.data.length;
+                        } else {
+                            document.getElementById('count-all').textContent = data.count || data.data.length;
+                        }
+                    } else {
+                        renderBookings([], status);
+                        if (status === 'Waiting') {
+                            document.getElementById('count-waiting').textContent = '0';
+                        } else {
+                            document.getElementById('count-all').textContent = '0';
+                        }
+                    }
+                })
+                .catch(() => {
+                    renderBookings([], status);
+                    if (status === 'Waiting') {
+                        document.getElementById('count-waiting').textContent = '0';
+                    } else {
+                        document.getElementById('count-all').textContent = '0';
+                    }
+                });
+        }
+
+        // แสดงผลรายการจอง
+        function renderBookings(bookings, status) {
+            const container = document.getElementById('bookings-list');
+
+            if (!bookings || bookings.length === 0) {
+                const message = (status === 'Waiting')
+                    ? 'ขณะนี้คุณไม่มีรายการจองห้องพักที่อยู่ในระหว่างรอเข้าใช้งาน (Waiting)'
+                    : 'คุณยังไม่มีประวัติการจองห้องพัก';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🏨</div>
+                        <h3>ยังไม่มีรายการจอง</h3>
+                        <p>${message}</p>
+                        <a href="rooms.html" class="btn-book">ค้นหาและจองห้องพักเลย</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            bookings.forEach(item => {
+                const isWaiting = item.payment_status === 'Waiting';
+                const statusBadge = isWaiting
+                    ? `<span class="status-badge status-waiting">⏳ กำลังรอเข้าใช้งาน (Waiting)</span>`
+                    : `<span class="status-badge status-paid">✅ ชำระเงินแล้ว (Paid)</span>`;
+
+                const checkInDate = new Date(item.check_in);
+                const checkOutDate = new Date(item.check_out);
+                const diffDays = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)) || 1;
+
+                const checkInStr = checkInDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+                const checkOutStr = checkOutDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+
+                const bookingDateStr = item.Date_booking 
+                    ? new Date(item.Date_booking).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : '-';
+
+                const roomImg = item.image_url || '';
+                const totalPrice = Number(item.total_price).toLocaleString();
+
+                html += `
+                <div class="booking-item-card">
+                    <div class="booking-item-img">
+                        <img src="${roomImg}" alt="${item.room_name || 'Room'}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=500&q=80';">
+                    </div>
+                    <div class="booking-item-content">
+                        <div>
+                            <div class="booking-header">
+                                <div>
+                                    <div class="booking-id-tag">รหัสการจอง: #${item.booking_id}</div>
+                                    <h3 class="booking-room-name">${item.room_name || 'ห้องพัก'}</h3>
+                                </div>
+                                ${statusBadge}
+                            </div>
+
+                            <div class="booking-details-grid">
+                                <div class="detail-box">
+                                    <span>เช็คอิน (Check-in)</span>
+                                    <strong>📅 ${checkInStr}</strong>
+                                </div>
+                                <div class="detail-box">
+                                    <span>เช็คเอาท์ (Check-out)</span>
+                                    <strong>📅 ${checkOutStr}</strong>
+                                </div>
+                                <div class="detail-box">
+                                    <span>ระยะเวลา</span>
+                                    <strong>🌙 ${diffDays} คืน</strong>
+                                </div>
+                                <div class="detail-box">
+                                    <span>ผู้เข้าพัก / เตียง</span>
+                                    <strong>👥 ${item.max_guests || 2} ท่าน | ${item.bed_type || '-'}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="booking-footer">
+                            <div class="booking-guest-info">
+                                👤 ผู้เข้าพัก: <strong>${item.cus_name || '-'}</strong> | 📞 ${item.phone || '-'}
+                                <br><small style="color: #94a3b8;">ทำรายการเมื่อ: ${bookingDateStr}</small>
+                            </div>
+                            <div class="booking-price-total">
+                                <span class="label">ยอดชำระสุทธิ:</span>
+                                <span class="amount">${totalPrice} ฿</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ดึงจำนวนรายการนับทั้ง Waiting และ All
+        function updateCounts() {
+            fetch('../script/getMyBookings.php?status=Waiting')
+                .then(r => r.json())
+                .then(d => { if (d.success) document.getElementById('count-waiting').textContent = d.count; });
+            fetch('../script/getMyBookings.php?status=all')
+                .then(r => r.json())
+                .then(d => { if (d.success) document.getElementById('count-all').textContent = d.count; });
+        }
+
+        // โหลดข้อมูลเมื่อเปิดหน้าเว็บ
+        document.addEventListener('DOMContentLoaded', function () {
+            const memberId = getAuthData('memberId');
+            if (!memberId) {
+                // ถ้ายังไม่ล็อกอิน ให้ดีดไปหน้า login
+                alert('กรุณาเข้าสู่ระบบก่อนดูรายการจอง');
+                window.location.href = 'logIn.html';
+                return;
+            }
+
+            // แสดงชื่อและอีเมลใน Card
+            const cusName = getAuthData('cus_name') || getAuthData('username') || 'ผู้ใช้งาน';
+            const email = getAuthData('email') || '';
+            const phone = getAuthData('phone') || '';
+            document.getElementById('user-display-name').textContent = cusName;
+            document.getElementById('user-display-email').textContent = `${email ? '📧 ' + email : ''} ${phone ? ' | 📞 ' + phone : ''}`;
+
+            updateNavAuth();
+            fetchBookings('Waiting');
+            updateCounts();
+        });
+    </script>
+</body>
+
+</html>
+

@@ -4,16 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Azure Resort - Home</title>
     <link rel="stylesheet" href="stlyer/stlye.css">
 </head>
 
 <body>
     <nav>
         <div class="logo">
-            <!-- <img src="" alt=""> -->
-            <h2>logo
-            </h2>
+            <h2>logo</h2>
         </div>
         <div class="page_bar">
             <ul class="nav-links">
@@ -21,16 +19,19 @@
                 <li><a href="rooms.html">Rooms</a></li>
                 <li><a href="offers.html">Offers</a></li>
                 <li><a href="location.html">Location</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
             </ul>
-            <button class="btn">BOOK NOW</button>
+            <div class="auth-action" id="nav-auth-section">
+                <button class="btn auth-btn" onclick="window.location.href='logIn.html'">LOGIN</button>
+            </div>
         </div>
     </nav>
+
     <section>
         <div class="photo">
-            <img src="" alt=""> <!--ดึงจากdata base-->
+            <img src="" alt=""> <!--ดึงจากdatabase-->
         </div>
     </section>
+
     <div class="search_bar">
         <form class="search_bar_container" id="search-form">
             <div class="checkIn">
@@ -48,9 +49,12 @@
             <button type="submit" id="search-btn">ค้นหาห้องพัก</button>
         </form>
     </div>
+
     <div class="promotion">
-        <p>โปรโมชั่น</p>
+        <p>โปรโมชั่น 🎉 สิทธิพิเศษสมาชิก: ได้รับส่วนลด 15% ทุกห้องพัก</p>
+
     </div>
+
     <main class="main_container">
         <div class="text">
             <h2>ห้องพักของเรา</h2>
@@ -60,21 +64,134 @@
             <!-- ข้อมูลห้องพักโหลดผ่าน PHP/JavaScript -->
         </div>
     </main>
+
     <footer>
-        <h2>Azure resort</h2>
+        <div class="footer-container">
+            <!-- ข้อมูลรีสอร์ท -->
+            <div class="footer-col">
+                <h2>Azure Resort</h2>
+                <p>สัมผัสประสบการณ์การพักผ่อนริมทะเลระดับพรีเมียม บรรยากาศเงียบสงบ พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
+                <div class="footer-social">
+                    <a href="#">📘 Facebook</a>
+                    <a href="#">📸 Instagram</a>
+                    <a href="#">🐦 Twitter</a>
+                    <a href="#">📺 YouTube</a>
+                </div>
+            </div>
+
+            <!-- ข้อมูลติดต่อทั้งหมด -->
+            <div class="footer-col">
+                <h3>ข้อมูลติดต่อ</h3>
+                <ul class="footer-contact-list">
+                    <li><span class="icon">📍</span> 123/456 ถนนชายหาด ตำบลหาดสวย<br>อำเภอเมือง จังหวัดชลบุรี 20000</li>
+                    <li><span class="icon">📞</span> โทรศัพท์: 038-XXX-XXX</li>
+                    <li><span class="icon">📧</span> อีเมล: info@azureresort.com</li>
+                    <li><span class="icon">💬</span> Line Official: @azureresort</li>
+                </ul>
+            </div>
+
+            <!-- เวลาทำการ -->
+            <div class="footer-col">
+                <h3>เวลาทำการ</h3>
+                <ul class="footer-hours-list">
+                    <li><span>เคาน์เตอร์ต้อนรับ:</span> <strong>24 ชั่วโมง</strong></li>
+                    <li><span>สำนักงาน:</span> <strong>08:00 - 20:00</strong></li>
+                    <li><span>ห้องอาหาร:</span> <strong>06:30 - 22:00</strong></li>
+                    <li><span>สระว่ายน้ำ:</span> <strong>06:00 - 20:00</strong></li>
+                    <li><span>สปา:</span> <strong>10:00 - 21:00</strong></li>
+                </ul>
+            </div>
+
+            <!-- เมนูลัด -->
+            <div class="footer-col">
+                <h3>เมนูลัด</h3>
+                <ul class="footer-links">
+                    <li><a href="main.html">หน้าแรก (Home)</a></li>
+                    <li><a href="rooms.html">ห้องพักของเรา (Rooms)</a></li>
+                    <li><a href="offers.html">โปรโมชั่นและข้อเสนอ (Offers)</a></li>
+                    <li><a href="location.html">การเดินทางและแผนที่ (Location)</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 Azure Resort. All Rights Reserved.</p>
+        </div>
     </footer>
 
     <script>
+        // ฟังก์ชันอ่านค่าผู้ใช้ (รองรับทั้ง Cookie และ LocalStorage เมื่อเปิดไฟล์ HTML ตรงๆ)
+        function getAuthData(key) {
+            const nameEQ = key + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i].trim();
+                if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length));
+            }
+            try { return localStorage.getItem(key); } catch (e) { return null; }
+        }
+
+        function clearAuthData() {
+            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user'];
+            keys.forEach(k => {
+                document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                try { localStorage.removeItem(k); } catch (e) { }
+            });
+        }
+
+        // ตรวจสอบคุกกี้: ถ้าล็อกอินแล้วให้เปลี่ยนเป็นรูปโปรไฟล์
+        function updateNavAuth() {
+            const memberId = getAuthData('memberId');
+            const username = getAuthData('username');
+            const authSection = document.getElementById('nav-auth-section');
+
+            if (authSection && (memberId || username)) {
+                const displayName = username || 'User';
+                authSection.innerHTML = `
+                    <div class="user-profile-menu">
+                        <a href="myBookings.html" class="profile-avatar-link" title="ดูรายการจองของฉัน (${displayName})">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" 
+                                 alt="User Profile" 
+                                 class="user-avatar" 
+                                 onerror="this.onerror=null; this.src='user-avatar.svg';">
+                        </a>
+                        <div id="profile-dropdown" class="profile-dropdown">
+                            <div class="dropdown-header">
+                                <strong>${displayName}</strong>
+                            </div>
+                            <a href="myBookings.html" class="dropdown-item" style="color: #14a2e4; font-weight: bold;">📋 รายการจองของฉัน (Waiting)</a>
+                            <a href="javascript:void(0)" class="dropdown-item logout-link" id="logout-btn">ออกจากระบบ (Logout)</a>
+                        </div>
+                    </div>
+                `;
+
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        clearAuthData();
+                        fetch('../script/logout.php').catch(() => { }).finally(() => {
+                            window.location.href = 'main.html';
+                        });
+                    });
+                }
+            } else if (authSection) {
+                authSection.innerHTML = `<button class="btn auth-btn" onclick="window.location.href='logIn.html'">LOGIN</button>`;
+            }
+        }
+
         // ฟังก์ชันค้นหาและดึงข้อมูลห้องพัก
         function fetchRooms() {
             const checkIn = document.getElementById('check-in').value;
             const checkOut = document.getElementById('check-out').value;
             const guests = document.getElementById('guest-count').value;
+            const isMember = !!(getAuthData('memberId') || getAuthData('username'));
 
             const params = new URLSearchParams();
             if (checkIn) params.append('check_in', checkIn);
             if (checkOut) params.append('check_out', checkOut);
             if (guests) params.append('guests_num', guests);
+            if (isMember) params.append('is_member', '1');
 
             const queryString = params.toString() ? `?${params.toString()}` : '';
             const url = `../script/mainPage.php${queryString}`;
@@ -82,19 +199,18 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data.success && data.data && data.data.length > 0) {
                         renderRooms(data.data);
                     } else {
-                        document.getElementById('rooms-list').innerHTML = '<p style="text-align:center;">ไม่สามารถโหลดข้อมูลห้องพักได้</p>';
+                        renderRooms([]);
                     }
                 })
-                .catch(error => {
-                    console.error('Error fetching rooms:', error);
-                    document.getElementById('rooms-list').innerHTML = '<p style="text-align:center;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
+                .catch(() => {
+                    renderRooms([]);
                 });
         }
 
-        // ฟังก์ชันแสดงการ์ดห้องพัก
+        // ฟังก์ชันแสดงการ์ดห้องพัก (คำนวณส่วนลดสมาชิก 15% เมื่อล็อกอินแล้ว)
         function renderRooms(rooms) {
             const container = document.getElementById('rooms-list');
             if (!rooms || rooms.length === 0) {
@@ -102,10 +218,27 @@
                 return;
             }
 
+            const isMember = !!(getAuthData('memberId') || getAuthData('username'));
             let html = '';
             rooms.forEach(room => {
-                const price = Number(room.price).toLocaleString();
+                const rawPrice = Number(room.original_price || room.price) || 0;
+                const finalPrice = room.is_member_discount
+                    ? Number(room.price)
+                    : (isMember ? Math.round(rawPrice * 0.85) : rawPrice);
                 const imgSrc = room.image_url || '';
+
+                const priceDisplayHtml = isMember ? `
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                            <span style="font-size: 13px; color: #94a3b8; text-decoration: line-through;">${rawPrice.toLocaleString()} ฿</span>
+                            <span style="background: #fee2e2; color: #dc2626; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold;">สมาชิก -15%</span>
+                        </div>
+                        <span style="font-size: 18px; font-weight: bold; color: #dc2626;">${finalPrice.toLocaleString()} ฿ <small style="font-size: 12px; color: #666; font-weight: normal;">/ คืน</small></span>
+                    </div>
+                ` : `
+                    <span style="font-size: 18px; font-weight: bold; color: #14a2e4;">${rawPrice.toLocaleString()} ฿ <small style="font-size: 12px; color: #666; font-weight: normal;">/ คืน</small></span>
+                `;
+
                 html += `
                 <div class="card" style="display: flex; gap: 20px; align-items: center; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
                     <img src="${imgSrc}" alt="${room.room_name}" style="width: 200px; height: 140px; object-fit: cover; border-radius: 6px; background-color: #eee;">
@@ -116,7 +249,7 @@
                             👥 รองรับ: ${room.max_guests} ท่าน | 🛏️ เตียง: ${room.bed_type || '-'} | 📐 ${room.room_size || '-'} ตร.ม.
                         </p>
                         <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 18px; font-weight: bold; color: #14a2e4;">${price} ฿ <small style="font-size: 12px; color: #666; font-weight: normal;">/ คืน</small></span>
+                            ${priceDisplayHtml}
                             <a href="rooms.html" style="background-color: #14a2e4; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-size: 14px;">ดูรายละเอียด</a>
                         </div>
                     </div>
@@ -132,8 +265,11 @@
             fetchRooms();
         });
 
-        // เมื่อโหลดหน้าเว็บเสร็จ ให้แสดงข้อมูลห้องพักทั้งหมดทันที
-        document.addEventListener('DOMContentLoaded', fetchRooms);
+        // เมื่อโหลดหน้าเว็บเสร็จ
+        document.addEventListener('DOMContentLoaded', function () {
+            updateNavAuth();
+            fetchRooms();
+        });
     </script>
 </body>
 

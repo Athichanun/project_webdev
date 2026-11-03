@@ -20,9 +20,10 @@
                 <li><a href="rooms.html">Rooms</a></li>
                 <li><a href="offers.html">Offers</a></li>
                 <li><a href="location.html" class="active">Location</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
             </ul>
-            <button class="btn">BOOK NOW</button>
+            <div class="auth-action" id="nav-auth-section">
+                <button class="btn auth-btn" onclick="window.location.href='logIn.html'">LOGIN</button>
+            </div>
         </div>
     </nav>
 
@@ -79,7 +80,6 @@
         </div>
 
         <div class="attractions-grid">
-            <!-- ส่วนนี้ loop เพื่อเอาข้อมูลมาแสดง -->
             <div class="attraction-card">
                 <div class="attraction-img">
                     <img src="" alt="Beach">
@@ -123,13 +123,125 @@
                     <span class="distance">🚢 45 นาที (เรือเร็ว)</span>
                 </div>
             </div>
-            <!-- จบ loop -->
         </div>
     </main>
 
     <footer>
-        <h2>Azure resort</h2>
+        <div class="footer-container">
+            <!-- ข้อมูลรีสอร์ท -->
+            <div class="footer-col">
+                <h2>Azure Resort</h2>
+                <p>สัมผัสประสบการณ์การพักผ่อนริมทะเลระดับพรีเมียม บรรยากาศเงียบสงบ พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
+                <div class="footer-social">
+                    <a href="#">📘 Facebook</a>
+                    <a href="#">📸 Instagram</a>
+                    <a href="#">🐦 Twitter</a>
+                    <a href="#">📺 YouTube</a>
+                </div>
+            </div>
+
+            <!-- ข้อมูลติดต่อทั้งหมด -->
+            <div class="footer-col">
+                <h3>ข้อมูลติดต่อ</h3>
+                <ul class="footer-contact-list">
+                    <li><span class="icon">📍</span> 123/456 ถนนชายหาด ตำบลหาดสวย<br>อำเภอเมือง จังหวัดชลบุรี 20000</li>
+                    <li><span class="icon">📞</span> โทรศัพท์: 038-XXX-XXX</li>
+                    <li><span class="icon">📧</span> อีเมล: info@azureresort.com</li>
+                    <li><span class="icon">💬</span> Line Official: @azureresort</li>
+                </ul>
+            </div>
+
+            <!-- เวลาทำการ -->
+            <div class="footer-col">
+                <h3>เวลาทำการ</h3>
+                <ul class="footer-hours-list">
+                    <li><span>เคาน์เตอร์ต้อนรับ:</span> <strong>24 ชั่วโมง</strong></li>
+                    <li><span>สำนักงาน:</span> <strong>08:00 - 20:00</strong></li>
+                    <li><span>ห้องอาหาร:</span> <strong>06:30 - 22:00</strong></li>
+                    <li><span>สระว่ายน้ำ:</span> <strong>06:00 - 20:00</strong></li>
+                    <li><span>สปา:</span> <strong>10:00 - 21:00</strong></li>
+                </ul>
+            </div>
+
+            <!-- เมนูลัด -->
+            <div class="footer-col">
+                <h3>เมนูลัด</h3>
+                <ul class="footer-links">
+                    <li><a href="main.html">หน้าแรก (Home)</a></li>
+                    <li><a href="rooms.html">ห้องพักของเรา (Rooms)</a></li>
+                    <li><a href="offers.html">โปรโมชั่นและข้อเสนอ (Offers)</a></li>
+                    <li><a href="location.html">การเดินทางและแผนที่ (Location)</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 Azure Resort. All Rights Reserved.</p>
+        </div>
     </footer>
+
+    <script>
+        function getAuthData(key) {
+            const nameEQ = key + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i].trim();
+                if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length));
+            }
+            try { return localStorage.getItem(key); } catch (e) { return null; }
+        }
+
+        function clearAuthData() {
+            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user'];
+            keys.forEach(k => {
+                document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                try { localStorage.removeItem(k); } catch (e) {}
+            });
+        }
+
+        function updateNavAuth() {
+            const memberId = getAuthData('memberId');
+            const username = getAuthData('username');
+            const authSection = document.getElementById('nav-auth-section');
+
+            if (authSection && (memberId || username)) {
+                const displayName = username || 'User';
+                authSection.innerHTML = `
+                    <div class="user-profile-menu">
+                        <a href="myBookings.html" class="profile-avatar-link" title="ดูรายการจองของฉัน (${displayName})">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" 
+                                 alt="User Profile" 
+                                 class="user-avatar" 
+                                 onerror="this.onerror=null; this.src='user-avatar.svg';">
+                        </a>
+                        <div id="profile-dropdown" class="profile-dropdown">
+                            <div class="dropdown-header">
+                                <strong>${displayName}</strong>
+                            </div>
+                            <a href="myBookings.html" class="dropdown-item" style="color: #14a2e4; font-weight: bold;">📋 รายการจองของฉัน (Waiting)</a>
+                            <a href="javascript:void(0)" class="dropdown-item logout-link" id="logout-btn">ออกจากระบบ (Logout)</a>
+                        </div>
+                    </div>
+                `;
+
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        clearAuthData();
+                        fetch('../script/logout.php').catch(() => {}).finally(() => {
+                            window.location.href = 'main.html';
+                        });
+                    });
+                }
+            } else if (authSection) {
+                authSection.innerHTML = `<button class="btn auth-btn" onclick="window.location.href='logIn.html'">LOGIN</button>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', updateNavAuth);
+    </script>
 </body>
 
 </html>
+

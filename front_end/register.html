@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Azure Resort</title>
+    <link rel="stylesheet" href="stlyer/logIn.css">
+</head>
+
+<body>
+    <div class="page">
+        <div class="container">
+            <h2>สมัครสมาชิก</h2>
+            <p style="font-size: 14px; color: #666; margin-bottom: 5px;">สร้างบัญชีผู้ใช้ใหม่สำหรับ Azure Resort</p>
+
+            <form action="../script/register.php" method="POST" id="register-form">
+                <input type="text" name="cus_name" placeholder="ชื่อ - นามสกุล *" required>
+                <input type="tel" name="phone" placeholder="เบอร์โทรศัพท์ (เช่น 0812345678) *" required>
+                <input type="email" name="email" placeholder="อีเมล (example@email.com) *" required>
+                <input type="text" name="username" placeholder="ชื่อผู้ใช้ (Username) *" required>
+                <input type="password" name="password" id="password" placeholder="รหัสผ่าน (Password) *" required>
+                <input type="password" name="confirm_password" id="confirm-password" placeholder="ยืนยันรหัสผ่าน *" required>
+                <button type="submit">สมัครสมาชิก</button>
+            </form>
+
+            <div id="error-box"></div>
+            <a href="logIn.html">มีบัญชีผู้ใช้อยู่แล้ว? เข้าสู่ระบบ</a>
+        </div>
+        <a class="back" href="main.html">back</a>
+    </div>
+
+    <script>
+        // ตรวจสอบรหัสผ่านตรงกันก่อนส่งฟอร์ม
+        document.getElementById('register-form').addEventListener('submit', function (e) {
+            const pass = document.getElementById('password').value;
+            const confirmPass = document.getElementById('confirm-password').value;
+            const errorBox = document.getElementById('error-box');
+
+            if (pass !== confirmPass) {
+                e.preventDefault();
+                errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน</p>';
+                return;
+            }
+
+            // ถ้าเป็นการรันแบบไฟล์ HTML ธรรมดา (file:/// หรือ Live Server port 5500)
+            if (window.location.protocol === 'file:' || window.location.port === '5500' || window.location.port === '3000') {
+                e.preventDefault();
+                const cus_name = this.elements['cus_name'].value;
+                const phone = this.elements['phone'].value;
+                const email = this.elements['email'].value;
+                const username = this.elements['username'].value;
+
+                document.cookie = `memberId=1; path=/; max-age=86400;`;
+                document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=86400;`;
+                document.cookie = `cus_name=${encodeURIComponent(cus_name)}; path=/; max-age=86400;`;
+                document.cookie = `phone=${encodeURIComponent(phone)}; path=/; max-age=86400;`;
+                document.cookie = `email=${encodeURIComponent(email)}; path=/; max-age=86400;`;
+
+                try {
+                    localStorage.setItem('memberId', '1');
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('cus_name', cus_name);
+                    localStorage.setItem('phone', phone);
+                    localStorage.setItem('email', email);
+                } catch(err) {}
+
+                alert('🎉 สมัครสมาชิกสำเร็จ (โหมดทดสอบ HTML)! ระบบจะนำท่านเข้าสู่ระบบทันที');
+                window.location.href = 'main.html';
+            }
+        });
+
+        // แสดงข้อความแจ้งเตือนจาก URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const errorBox = document.getElementById('error-box');
+
+        if (error === 'userexists') {
+            errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">ชื่อผู้ใช้นี้ถูกใช้งานแล้ว กรุณาเลือกชื่ออื่น</p>';
+        } else if (error === 'emailexists') {
+            errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">อีเมลนี้มีบัญชีสมาชิกในระบบแล้ว</p>';
+        } else if (error === 'emptyfields') {
+            errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">กรุณากรอกข้อมูลให้ครบทุกช่อง</p>';
+        } else if (error === 'passwordmismatch') {
+            errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">รหัสผ่านไม่ตรงกัน</p>';
+        }
+    </script>
+</body>
+
+</html>
+

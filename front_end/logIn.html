@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login - Azure Resort</title>
     <link rel="stylesheet" href="stlyer/logIn.css">
 </head>
 
@@ -13,16 +13,63 @@
         <div class="container">
             <img class="logo" src="" alt="">
             <h2>Login</h2>
-            <form action="../script/login.php" method="POST">
-                <input type="text" name="username" placeholder="Username">
-                <input type="password" name="password" placeholder="Password">
+            <form action="../script/login.php" method="POST" id="login-form">
+                <input type="text" name="username" id="username" placeholder="Username" required>
+                <input type="password" name="password" id="password" placeholder="Password" required>
                 <button type="submit">Login</button>
             </form>
+
+            <div id="error-box"></div>
             <a href="">Forgot Password?</a>
-            <a href="">Don't have an account?</a>
+            <a href="register.html">Don't have an account? Register</a>
         </div>
         <a class="back" href="main.html">back</a>
     </div>
+
+    <script>
+        // แสดงข้อความแจ้งเตือนเมื่อชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้องจาก PHP
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error') === 'invalid') {
+            const errorBox = document.getElementById('error-box');
+            if (errorBox) {
+                errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</p>';
+            }
+        }
+
+        // จัดการเมื่อกดปุ่ม Login
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            const isStaticMode = (window.location.protocol === 'file:' || 
+                                  window.location.port === '5500' || 
+                                  window.location.port === '3000' || 
+                                  window.location.port === '5501');
+
+            // หากเป็นการรันแบบไฟล์ HTML ธรรมดา (VS Code Run / Live Server) ที่ไม่มี PHP Engine
+            if (isStaticMode) {
+                e.preventDefault();
+                const user = document.getElementById('username').value.trim();
+                const pass = document.getElementById('password').value.trim();
+
+                if (!user || !pass) {
+                    alert('กรุณากรอก Username และ Password');
+                    return;
+                }
+
+                // บันทึก Session เข้า Cookie และ LocalStorage เพื่อให้ Navbar อัปเดตเป็นรูปโปรไฟล์
+                document.cookie = `memberId=1; path=/; max-age=86400;`;
+                document.cookie = `username=${encodeURIComponent(user)}; path=/; max-age=86400;`;
+                document.cookie = `cus_name=${encodeURIComponent(user)}; path=/; max-age=86400;`;
+
+                try {
+                    localStorage.setItem('memberId', '1');
+                    localStorage.setItem('username', user);
+                    localStorage.setItem('cus_name', user);
+                } catch (err) {}
+
+                window.location.href = 'main.html';
+            }
+            // หากรันผ่าน Apache / PHP Server ปกติ จะปล่อยให้ Form POST ไปยัง ../script/login.php ตามปกติ
+        });
+    </script>
 </body>
 
 </html>
