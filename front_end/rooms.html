@@ -37,9 +37,17 @@
         </div>
     </section>
 
-    <!-- Filter & Sort Bar -->
-    <div class="filter-bar">
-        <div class="filter-container">
+    <!-- Filter & Sort Bar (ตำแหน่งและรูปแบบเดียวกับ search ของ main) -->
+    <div class="search_bar filter-bar">
+        <div class="search_bar_container filter-container">
+            <div class="filter-item">
+                <label for="filter-check-in">เช็คอิน</label>
+                <input type="date" id="filter-check-in" style="padding: 9px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem; font-family: 'Sarabun', sans-serif;">
+            </div>
+            <div class="filter-item">
+                <label for="filter-check-out">เช็คเอาท์</label>
+                <input type="date" id="filter-check-out" style="padding: 9px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem; font-family: 'Sarabun', sans-serif;">
+            </div>
             <div class="filter-item">
                 <label for="room-type">ประเภทห้อง</label>
                 <select id="room-type">
@@ -60,7 +68,7 @@
                 </select>
             </div>
             <div class="filter-item">
-                <label for="guests">จำนวนผู้เข้าพัก</label>
+                <label for="guests">ผู้เข้าพัก</label>
                 <select id="guests">
                     <option value="all">ทั้งหมด</option>
                     <option value="1-2">1 - 2 คน</option>
@@ -81,6 +89,12 @@
             </div>
             <button class="filter-btn" id="filter-btn">ค้นหา</button>
         </div>
+    </div>
+
+    <!-- แถบแจ้งเตือนเมื่อกรองตามวันที่ -->
+    <div id="date-filter-notice" style="display: none; max-width: 1200px; margin: 16px auto 0; padding: 10px 20px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; color: #065f46; font-size: 14px; text-align: center;">
+        ✅ แสดงเฉพาะห้องที่ <strong>ว่าง</strong> ในช่วงวันที่ <span id="date-filter-range"></span>
+        <a href="javascript:void(0)" id="clear-date-filter" style="margin-left: 12px; color: #dc2626; font-weight: bold; text-decoration: underline;">ล้างตัวกรอง</a>
     </div>
 
     <!-- Room Cards (โหลดจาก PHP) -->
@@ -148,7 +162,6 @@
     </footer>
 
     <script>
-        // ฟังก์ชันอ่านค่าคุกกี้
         // ฟังก์ชันอ่านค่าผู้ใช้ (รองรับทั้ง Cookie และ LocalStorage เมื่อเปิดไฟล์ HTML ตรงๆ)
         function getAuthData(key) {
             const nameEQ = key + "=";
@@ -209,13 +222,23 @@
             }
         }
 
-        // ฟังก์ชั่นหลัก: ดึงข้อมูลห้องพักจาก PHP
+        // เก็บวันที่ที่ผู้ใช้กรอกไว้สำหรับส่งไปหน้า booking
+        let currentFilterCheckIn = '';
+        let currentFilterCheckOut = '';
+
+        // ฟังก์ชั่นหลัก: ดึงข้อมูลห้องพักจาก PHP (รองรับกรองตามช่วงวันที่)
         function fetchRooms() {
             const roomType = document.getElementById('room-type').value;
             const priceRange = document.getElementById('price-range').value;
             const guests = document.getElementById('guests').value;
             const sortBy = document.getElementById('sort-by').value;
+            const checkIn = document.getElementById('filter-check-in').value;
+            const checkOut = document.getElementById('filter-check-out').value;
             const isMember = !!(getAuthData('memberId') || getAuthData('username'));
+
+            // เก็บค่าวันที่สำหรับส่งต่อไปหน้า booking
+            currentFilterCheckIn = checkIn;
+            currentFilterCheckOut = checkOut;
 
             const params = new URLSearchParams({
                 room_type: roomType,
@@ -223,6 +246,17 @@
                 guests: guests,
                 sort_by: sortBy
             });
+
+            // ถ้ากรอกวันที่ครบทั้งคู่ ให้ส่งไปกรองจาก backend
+            if (checkIn && checkOut) {
+                if (checkOut <= checkIn) {
+                    alert('⚠️ วันเช็คเอาท์ต้องมากกว่าวันเช็คอิน');
+                    return;
+                }
+                params.append('check_in', checkIn);
+                params.append('check_out', checkOut);
+            }
+
             if (isMember) {
                 params.append('is_member', '1');
             }
@@ -230,6 +264,15 @@
             const url = `../script/rooms.php?${params.toString()}`;
 
             document.getElementById('result-count').textContent = 'กำลังโหลด...';
+
+            // แสดง/ซ่อนแถบแจ้งเตือนตัวกรองวันที่
+            const notice = document.getElementById('date-filter-notice');
+            if (checkIn && checkOut && checkOut > checkIn) {
+                document.getElementById('date-filter-range').textContent = `${checkIn} ถึง ${checkOut}`;
+                notice.style.display = 'block';
+            } else {
+                notice.style.display = 'none';
+            }
 
             fetch(url)
                 .then(response => response.json())
@@ -248,7 +291,7 @@
                 });
         }
 
-        // ฟังก์ชั่น render การ์ดห้องพัก (คำนวณส่วนลด 15% เมื่อล็อกอินแล้ว)
+        // ฟังก์ชั่น render การ์ดห้องพัก
         function renderRooms(rooms) {
             const grid = document.getElementById('rooms-grid');
             
@@ -258,6 +301,8 @@
             }
 
             const isMember = !!(getAuthData('memberId') || getAuthData('username'));
+            const hasDateFilter = !!(currentFilterCheckIn && currentFilterCheckOut);
+
             let html = '';
             rooms.forEach(room => {
                 const rawPrice = Number(room.original_price || room.price) || 0;
@@ -269,6 +314,11 @@
                     ? `<span class="room-badge">${room.badge}</span>`
                     : '';
                 const imgSrc = room.path_photo || room.image_url || '';
+
+                // แสดงป้ายเฉพาะเมื่อกรองวันที่ (ไม่ใช้ is_reserved)
+                const statusBadgeHtml = hasDateFilter
+                    ? `<span class="room-status-badge room-status-available">ว่างในช่วงวันที่เลือก ✔</span>`
+                    : '';
 
                 const priceDisplayHtml = isMember ? `
                     <div class="member-price-box">
@@ -293,6 +343,7 @@
                     <div class="room-img">
                         <img src="${imgSrc}" alt="${room.room_name}">
                         ${badgeHtml}
+                        ${statusBadgeHtml}
                     </div>
                     <div class="room-info">
                         <h3>${room.room_name}</h3>
@@ -306,10 +357,7 @@
                             <div class="room-price">
                                 ${priceDisplayHtml}
                             </div>
-                            ${room.is_reserved == 1
-                        ? `<button class="book-btn" style="background-color: #ccc; cursor: not-allowed;" disabled>เต็มแล้ว</button>`
-                        : `<button class="book-btn" onclick="goToBookingPage(${room.room_id}, '${room.room_name}', ${finalPrice}, ${rawPrice})">จองห้องพัก</button>`
-                    }
+                            <button class="book-btn" onclick="goToBookingPage(${room.room_id}, '${room.room_name}', ${finalPrice}, ${rawPrice})">จองห้องพัก</button>
                         </div>
                     </div>
                 </div>`;
@@ -318,7 +366,7 @@
             grid.innerHTML = html;
         }
 
-        // ฟังก์ชันจัดการเมื่อลูกค้ากดปุ่ม "จองห้องพัก"
+        // ฟังก์ชันจัดการเมื่อลูกค้ากดปุ่ม "จองห้องพัก" (ส่งวันที่ที่เลือกไว้ไปด้วย)
         function goToBookingPage(roomId, roomName, price, originalPrice) {
             const params = new URLSearchParams({
                 room_id: roomId,
@@ -328,7 +376,33 @@
             if (originalPrice && originalPrice !== price) {
                 params.append('orig_price', originalPrice);
             }
+            // ส่งวันที่ที่กรองไว้ไปยังหน้า booking เพื่อ Auto-fill
+            if (currentFilterCheckIn) params.append('check_in', currentFilterCheckIn);
+            if (currentFilterCheckOut) params.append('check_out', currentFilterCheckOut);
+
             window.location.href = `booking.html?${params.toString()}`;
+        }
+
+        // ตั้ง min date ของช่องวันที่ให้เป็นวันนี้
+        function setMinDates() {
+            const today = new Date().toISOString().split('T')[0];
+            const checkInEl = document.getElementById('filter-check-in');
+            const checkOutEl = document.getElementById('filter-check-out');
+            checkInEl.setAttribute('min', today);
+            checkOutEl.setAttribute('min', today);
+
+            // เมื่อเปลี่ยนวัน check-in ให้ปรับ min ของ check-out
+            checkInEl.addEventListener('change', function () {
+                if (this.value) {
+                    const nextDay = new Date(this.value);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    checkOutEl.setAttribute('min', nextDay.toISOString().split('T')[0]);
+                    // ถ้า check-out น้อยกว่า check-in ให้เคลียร์
+                    if (checkOutEl.value && checkOutEl.value <= this.value) {
+                        checkOutEl.value = nextDay.toISOString().split('T')[0];
+                    }
+                }
+            });
         }
 
         // Event listeners
@@ -338,8 +412,38 @@
             select.addEventListener('change', fetchRooms);
         });
 
+        // ปุ่มล้างตัวกรองวันที่
+        const clearBtn = document.getElementById('clear-date-filter');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                document.getElementById('filter-check-in').value = '';
+                document.getElementById('filter-check-out').value = '';
+                fetchRooms();
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             updateNavAuth();
+            setMinDates();
+
+            // อ่านค่าจาก URL query parameters (ถ้าส่งมาจาก main.html)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlCheckIn = urlParams.get('check_in');
+            const urlCheckOut = urlParams.get('check_out');
+            const urlGuests = urlParams.get('guests');
+            const urlRoomType = urlParams.get('room_type');
+
+            if (urlCheckIn) document.getElementById('filter-check-in').value = urlCheckIn;
+            if (urlCheckOut) document.getElementById('filter-check-out').value = urlCheckOut;
+            if (urlGuests) {
+                const guestSelect = document.getElementById('guests');
+                const gNum = parseInt(urlGuests, 10);
+                if (gNum <= 2) guestSelect.value = '1-2';
+                else if (gNum <= 4) guestSelect.value = '3-4';
+                else if (gNum >= 5) guestSelect.value = '5+';
+            }
+            if (urlRoomType) document.getElementById('room-type').value = urlRoomType;
+
             fetchRooms();
         });
     </script>

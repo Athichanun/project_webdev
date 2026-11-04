@@ -30,21 +30,30 @@
     padding-bottom: 4px;
 }
 
-.filter-bar {
+/* Filter & Search Bar - รูปแบบและตำแหน่งเดียวกับ search ของ main */
+.filter-bar,
+.search_bar {
+    border: none;
     display: flex;
+    align-items: center;
     justify-content: center;
-    padding: 20px;
-    background-color: #f9f9f9;
+    background-color: transparent;
+    padding: 0;
 }
 
-.filter-container {
+.filter-container,
+.search_bar_container {
     display: flex;
     align-items: flex-end;
+    justify-content: space-between;
     gap: 20px;
+    padding: 12px 24px;
+    position: relative;
+    margin-top: -30px;
     background-color: #ffffff;
-    padding: 20px 30px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
 .filter-item {
@@ -84,6 +93,12 @@
     cursor: pointer;
     font-family: 'Sarabun', sans-serif;
     font-size: 0.9rem;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    transition: background-color 0.2s;
 }
 
 .filter-btn:hover {
@@ -138,6 +153,23 @@
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: bold;
+}
+
+/* ป้ายสถานะความว่างของห้องพัก */
+.room-status-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.room-status-available {
+    background-color: #10b981;
+    color: #ffffff;
 }
 
 .room-info {

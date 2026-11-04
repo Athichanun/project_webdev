@@ -15,12 +15,22 @@
             <p style="font-size: 14px; color: #666; margin-bottom: 5px;">สร้างบัญชีผู้ใช้ใหม่สำหรับ Azure Resort</p>
 
             <form action="../script/register.php" method="POST" id="register-form">
-                <input type="text" name="cus_name" placeholder="ชื่อ - นามสกุล *" required>
-                <input type="tel" name="phone" placeholder="เบอร์โทรศัพท์ (เช่น 0812345678) *" required>
-                <input type="email" name="email" placeholder="อีเมล (example@email.com) *" required>
-                <input type="text" name="username" placeholder="ชื่อผู้ใช้ (Username) *" required>
+                <input type="text" name="cus_name" id="cus_name" placeholder="ชื่อ - นามสกุล *"
+                    pattern="[ก-๙]+(?:\s+[ก-๙]+)+"
+                    title="กรุณากรอกชื่อและนามสกุลเป็นภาษาไทย โดยเว้นวรรคระหว่างชื่อและนามสกุล เช่น สมชาย ใจดี" required>
+
+                <input type="tel" name="phone" id="phone" placeholder="เบอร์โทรศัพท์ (เช่น 0812345678) *"
+                    pattern="0[689]\d{8}"
+                    title="เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 06, 08 หรือ 09 และมีความยาว 10 หลัก (เช่น 0812345678)" required>
+
+                <input type="email" name="email" id="email" placeholder="อีเมล (example@email.com) *"
+                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                    title="กรุณากรอกอีเมลให้ถูกต้องตามรูปแบบ เช่น example@email.com" required>
+
+                <input type="text" name="username" id="username" placeholder="ชื่อผู้ใช้ (Username) *" required>
                 <input type="password" name="password" id="password" placeholder="รหัสผ่าน (Password) *" required>
-                <input type="password" name="confirm_password" id="confirm-password" placeholder="ยืนยันรหัสผ่าน *" required>
+                <input type="password" name="confirm_password" id="confirm-password" placeholder="ยืนยันรหัสผ่าน *"
+                    required>
                 <button type="submit">สมัครสมาชิก</button>
             </form>
 
@@ -31,7 +41,7 @@
     </div>
 
     <script>
-        // ตรวจสอบรหัสผ่านตรงกันก่อนส่งฟอร์ม
+        // ตรวจสอบเฉพาะรหัสผ่านตรงกันก่อนส่งฟอร์ม (ส่วน pattern ให้ HTML และ CSS จัดการ)
         document.getElementById('register-form').addEventListener('submit', function (e) {
             const pass = document.getElementById('password').value;
             const confirmPass = document.getElementById('confirm-password').value;
@@ -40,6 +50,7 @@
             if (pass !== confirmPass) {
                 e.preventDefault();
                 errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน</p>';
+                document.getElementById('confirm-password').focus();
                 return;
             }
 
@@ -63,7 +74,7 @@
                     localStorage.setItem('cus_name', cus_name);
                     localStorage.setItem('phone', phone);
                     localStorage.setItem('email', email);
-                } catch(err) {}
+                } catch (err) { }
 
                 alert('🎉 สมัครสมาชิกสำเร็จ (โหมดทดสอบ HTML)! ระบบจะนำท่านเข้าสู่ระบบทันที');
                 window.location.href = 'main.html';
@@ -83,9 +94,14 @@
             errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">กรุณากรอกข้อมูลให้ครบทุกช่อง</p>';
         } else if (error === 'passwordmismatch') {
             errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">รหัสผ่านไม่ตรงกัน</p>';
+        } else if (error === 'invalidname') {
+            errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">กรุณากรอกชื่อ-นามสกุลเป็นภาษาไทย และเว้นวรรคระหว่างชื่อและนามสกุล</p>';
+        } else if (error === 'invalidphone') {
+            errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 06, 08 หรือ 09 และมีความยาว 10 หลัก</p>';
+        } else if (error === 'invalidemail') {
+            errorBox.innerHTML = '<p style="color: #e74c3c; font-size: 14px; margin-top: 10px;">รูปแบบอีเมลไม่ถูกต้อง</p>';
         }
     </script>
 </body>
 
 </html>
-

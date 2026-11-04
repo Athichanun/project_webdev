@@ -28,19 +28,23 @@ if (empty($roomId) || empty($cusName) || empty($phone) || empty($checkIn) || emp
 try {
     $pdo->beginTransaction();
 
-    // 1. เช็คราคาและสถานะห้องพักจากตาราง rooms
-    $stmtRoom = $pdo->prepare("SELECT price, is_reserved FROM rooms WHERE room_id = ?");
+    // 1. เช็คราคาห้องพักจากตาราง rooms
+    $stmtRoom = $pdo->prepare("SELECT price FROM rooms WHERE room_id = ?");
     $stmtRoom->execute([$roomId]);
     $room = $stmtRoom->fetch(PDO::FETCH_ASSOC);
 
     if (!$room) {
         throw new Exception("ไม่พบข้อมูลห้องพักที่เลือก");
     }
-    if ($room['is_reserved'] == 1) {
-        throw new Exception("ห้องพักนี้ถูกจองไปแล้ว กรุณาเลือกห้องอื่น");
+
+    // 2. ตรวจสอบว่าห้องพักมีรายการจองทับซ้อนกับช่วงวันดังกล่าวหรือไม่
+    $stmtOverlap = $pdo->prepare("SELECT booking_id FROM Booking WHERE room_id = ? AND check_in < ? AND check_out > ? AND (payment_status IS NULL OR payment_status != 'Cancelled') LIMIT 1");
+    $stmtOverlap->execute([$roomId, $checkOut, $checkIn]);
+    if ($stmtOverlap->fetch()) {
+        throw new Exception("ขออภัย ห้องพักนี้มีผู้จองในช่วงวันดังกล่าวแล้ว กรุณาเลือกวันที่หรือห้องพักอื่น");
     }
 
-    // 2. คำนวณจำนวนคืนและราคารวม
+    // 3. คำนวณจำนวนคืนและราคารวม
     $datetime1 = new DateTime($checkIn);
     $datetime2 = new DateTime($checkOut);
     $nights = (int)$datetime1->diff($datetime2)->format('%r%a');
@@ -49,7 +53,7 @@ try {
         throw new Exception("วันที่เช็คเอาท์ต้องมากกว่าวันที่เช็คอินอย่างน้อย 1 วัน");
     }
 
-    // 3. จัดการข้อมูลลูกค้าในตาราง Customer
+    // 4. จัดการข้อมูลลูกค้าในตาราง Customer
     $loggedInCusId = isset($_COOKIE['memberId']) ? (int)$_COOKIE['memberId'] : null;
     $isMember = !empty($loggedInCusId) || (isset($_POST['is_member']) && $_POST['is_member'] == '1');
 
@@ -79,7 +83,7 @@ try {
         }
     }
 
-    // 4. บันทึกการจองลงตาราง Booking (รวม cus_name, phone, email)
+    // 5. บันทึกการจองลงตาราง Booking (รวม cus_name, phone, email)
     try {
         $sqlBooking = "INSERT INTO Booking (cus_id, cus_name, phone, email, room_id, check_in, check_out, total_price, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmtBooking = $pdo->prepare($sqlBooking);
@@ -93,14 +97,10 @@ try {
         $bookingId = $pdo->lastInsertId();
     }
 
-    // 5. บันทึกประวัติลงตาราง History
+    // 6. บันทึกประวัติลงตาราง History
     $currentDate = date('Y-m-d H:i:s');
     $stmtHistory = $pdo->prepare("INSERT INTO History (booking_id, Date_booking) VALUES (?, ?)");
     $stmtHistory->execute([$bookingId, $currentDate]);
-
-    // 6. อัปเดตสถานะห้องพักในตาราง rooms เป็นไม่ว่าง (is_reserved = 1)
-    $stmtUpdateRoom = $pdo->prepare("UPDATE rooms SET is_reserved = 1 WHERE room_id = ?");
-    $stmtUpdateRoom->execute([$roomId]);
 
     $pdo->commit();
 

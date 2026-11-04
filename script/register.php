@@ -20,14 +20,33 @@ if (empty($cusName) || empty($phone) || empty($email) || empty($user) || empty($
     exit();
 }
 
-// 2. ตรวจสอบรหัสผ่านตรงกันหรือไม่
+// 2. ตรวจสอบรูปแบบข้อมูลตาม Pattern ที่กำหนดในหน้า register.html
+// 2.1 ตรวจสอบชื่อ-นามสกุล (ภาษาไทยและเว้นวรรคระหว่างชื่อและนามสกุล)
+if (!preg_match('/^[ก-๙]+(?:\s+[ก-๙]+)+$/u', $cusName)) {
+    header("Location: ../front_end/register.html?error=invalidname");
+    exit();
+}
+
+// 2.2 ตรวจสอบเบอร์โทรศัพท์ (ขึ้นต้นด้วย 06, 08, 09 และมี 10 หลัก)
+if (!preg_match('/^0[689]\d{8}$/', $phone)) {
+    header("Location: ../front_end/register.html?error=invalidphone");
+    exit();
+}
+
+// 2.3 ตรวจสอบรูปแบบอีเมล
+if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $email)) {
+    header("Location: ../front_end/register.html?error=invalidemail");
+    exit();
+}
+
+// 3. ตรวจสอบรหัสผ่านตรงกันหรือไม่
 if ($pass !== $confirmPassword) {
     header("Location: ../front_end/register.html?error=passwordmismatch");
     exit();
 }
 
 try {
-    // 3. ตรวจสอบว่าชื่อผู้ใช้ (username) ถูกใช้งานไปแล้วหรือไม่
+    // 4. ตรวจสอบว่าชื่อผู้ใช้ (username) ถูกใช้งานไปแล้วหรือไม่
     $stmtCheckUser = $pdo->prepare("SELECT cus_id FROM Customer WHERE username = ? LIMIT 1");
     $stmtCheckUser->execute([$user]);
     if ($stmtCheckUser->fetch()) {
@@ -35,7 +54,7 @@ try {
         exit();
     }
 
-    // 4. ตรวจสอบว่ามีอีเมลนี้ในระบบแล้วหรือไม่
+    // 5. ตรวจสอบว่ามีอีเมลนี้ในระบบแล้วหรือไม่
     $stmtCheckEmail = $pdo->prepare("SELECT cus_id, username FROM Customer WHERE email = ? LIMIT 1");
     $stmtCheckEmail->execute([$email]);
     $existing = $stmtCheckEmail->fetch(PDO::FETCH_ASSOC);
@@ -73,14 +92,14 @@ try {
         $cusId = $pdo->lastInsertId();
     }
 
-    // 5. เข้าสู่ระบบให้อัตโนมัติด้วยการตั้งค่าคุกกี้
+    // 6. เข้าสู่ระบบให้อัตโนมัติด้วยการตั้งค่าคุกกี้
     setcookie("memberId", $cusId, time() + 86400, "/");
     setcookie("username", $user, time() + 86400, "/");
     setcookie("cus_name", $cusName, time() + 86400, "/");
     setcookie("phone", $phone, time() + 86400, "/");
     setcookie("email", $email, time() + 86400, "/");
 
-    // 6. ไปยังหน้าแรก main.html
+    // 7. ไปยังหน้าแรก main.html
     header("Location: ../front_end/main.html");
     exit();
 
@@ -88,4 +107,3 @@ try {
     die("เกิดข้อผิดพลาดในการสมัครสมาชิก: " . $e->getMessage());
 }
 ?>
-

@@ -9,6 +9,19 @@ $sortBy = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'default';
 $sql = "SELECT * FROM rooms WHERE 1=1";
 $params = [];
 
+// ถ้าผู้ใช้ระบุวันเช็คอินและเช็คเอาท์ ให้ค้นหาเฉพาะห้องที่ไม่มีรายการจองทับซ้อนในช่วงนั้น
+if (!empty($checkIn) && !empty($checkOut)) {
+    $sql .= " AND NOT EXISTS (
+        SELECT 1 FROM Booking b 
+        WHERE b.room_id = rooms.room_id 
+          AND b.check_in < ? 
+          AND b.check_out > ?
+          AND (b.payment_status IS NULL OR b.payment_status != 'Cancelled')
+    )";
+    $params[] = $checkOut;
+    $params[] = $checkIn;
+}
+
 if ($guestsNum > 0) {
     $sql .= " AND max_guests >= ?";
     $params[] = $guestsNum;
@@ -76,3 +89,4 @@ try {
         'message' => 'เกิดข้อผิดพลาดในการดึงข้อมูล: ' . $e->getMessage()
     ]);
 }
+?>

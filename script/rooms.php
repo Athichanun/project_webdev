@@ -6,9 +6,24 @@ $roomType = isset($_GET['room_type']) ? $_GET['room_type'] : 'all';
 $priceRange = isset($_GET['price_range']) ? $_GET['price_range'] : 'all';
 $guests = isset($_GET['guests']) ? $_GET['guests'] : 'all';
 $sortBy = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'default';
+$checkIn = isset($_GET['check_in']) ? trim($_GET['check_in']) : '';
+$checkOut = isset($_GET['check_out']) ? trim($_GET['check_out']) : '';
 
 $sql = "SELECT * FROM rooms WHERE 1=1";
 $params = [];
+
+// ถ้าระบุวันเช็คอินและเช็คเอาท์ ให้กรองเฉพาะห้องที่ว่างในช่วงนั้น
+if (!empty($checkIn) && !empty($checkOut)) {
+    $sql .= " AND NOT EXISTS (
+        SELECT 1 FROM Booking b 
+        WHERE b.room_id = rooms.room_id 
+          AND b.check_in < ? 
+          AND b.check_out > ?
+          AND (b.payment_status IS NULL OR b.payment_status != 'Cancelled')
+    )";
+    $params[] = $checkOut;
+    $params[] = $checkIn;
+}
 
 if ($roomType !== 'all') {
     $sql .= " AND room_type = ?";
@@ -81,6 +96,11 @@ foreach ($rooms as &$room) {
         $room['is_member_discount'] = false;
         $room['discount_percent'] = 0;
     }
+
+    // ถ้ามีการกรองวันที่ ห้องที่ผ่านเงื่อนไขคือ "ว่าง" ในช่วงนั้นทั้งหมด
+    if (!empty($checkIn) && !empty($checkOut)) {
+        $room['date_available'] = true;
+    }
 }
 unset($room);
 
@@ -93,7 +113,10 @@ echo json_encode([
         'room_type' => $roomType,
         'price_range' => $priceRange,
         'guests' => $guests,
-        'sort_by' => $sortBy
+        'sort_by' => $sortBy,
+        'check_in' => $checkIn,
+        'check_out' => $checkOut
     ],
     'data' => $rooms
 ]);
+?>

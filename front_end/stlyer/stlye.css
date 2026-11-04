@@ -173,35 +173,65 @@ section {
 
 .search_bar_container {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    /* border: 1px solid black; */
     gap: 20px;
-    padding: 10px;
-    padding-left: 20px;
-    padding-right: 20px;
-    cursor: pointer;
+    padding: 12px 24px;
     position: relative;
     margin-top: -30px;
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
 .checkIn,
 .checkOut,
 .guest {
-    display: grid;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
+.search_bar_container label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #555;
+}
+
+.search_bar_container input {
+    padding: 9px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-family: 'Sarabun', sans-serif;
+    outline: none;
+}
+
+.search_bar_container input:focus {
+    border-color: #14a2e4;
+}
 
 .search_bar_container button {
     background-color: #14a2e4;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
     color: white;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.9rem;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
+
+.search_bar_container button:hover {
+    background-color: #1190cc;
 }
 
 .promotion {
@@ -388,4 +418,18 @@ footer {
     text-align: center;
     font-size: 13px;
     color: #64748b;
+}
+
+/* ป้ายสถานะความว่างของห้องพัก */
+.room-status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.room-status-available {
+    background-color: #10b981;
+    color: #ffffff;
 }

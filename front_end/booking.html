@@ -63,6 +63,9 @@
                     </div>
                 </div>
 
+                <!-- กล่องแจ้งเตือนสถานะห้องว่าง/ไม่ว่าง (Real-time) -->
+                <div id="availability-status" style="display: none; padding: 10px 14px; border-radius: 6px; font-size: 14px; margin-bottom: 15px; font-weight: bold;"></div>
+
                 <div class="form-group">
                     <label for="payment-method">วิธีการชำระเงิน *</label>
                     <select id="payment-method" name="payment_method" onchange="togglePaymentBox()">
@@ -78,7 +81,7 @@
                     <p style="font-size:13px; color:#666; margin-top:8px;">ชื่อบัญชี: บจก. อะซูร์ รีสอร์ท</p>
                 </div>
 
-                <button type="submit" class="submit-pay-btn">ยืนยันการจองและชำระเงิน</button>
+                <button type="submit" class="submit-pay-btn" id="submit-btn">ยืนยันการจองและชำระเงิน</button>
             </form>
         </div>
 
@@ -282,17 +285,104 @@
         document.getElementById('display-room-name').textContent = roomName;
         document.getElementById('display-price').textContent = pricePerNight.toLocaleString() + ' ฿';
 
-        // ตั้งค่าวันที่เริ่มต้น (วันนี้ และ พรุ่งนี้)
+        // ตั้งค่าวันที่เริ่มต้น (ถ้ามีจาก URL ใช้ค่านั้น มิฉะนั้นใช้วันนี้/พรุ่งนี้)
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
         const checkInInput = document.getElementById('check-in');
         const checkOutInput = document.getElementById('check-out');
-        checkInInput.value = today.toISOString().split('T')[0];
-        checkOutInput.value = tomorrow.toISOString().split('T')[0];
 
-        // ฟังก์ชันคำนวณจำนวนคืนและราคารวมแบบ Real-time
+        const urlCheckIn = urlParams.get('check_in');
+        const urlCheckOut = urlParams.get('check_out');
+
+        checkInInput.value = urlCheckIn || today.toISOString().split('T')[0];
+        checkOutInput.value = urlCheckOut || tomorrow.toISOString().split('T')[0];
+
+        // กำหนด min date
+        checkInInput.setAttribute('min', today.toISOString().split('T')[0]);
+        checkOutInput.setAttribute('min', today.toISOString().split('T')[0]);
+
+        // สถานะ: ห้องว่างหรือไม่ (ป้องกันการส่งฟอร์มเมื่อห้องไม่ว่าง)
+        let isRoomAvailable = true;
+        let checkTimer = null;
+
+        // ฟังก์ชันเช็คห้องว่าง Real-time (เรียก API checkAvailability.php)
+        function checkAvailability() {
+            const ci = checkInInput.value;
+            const co = checkOutInput.value;
+            const statusBox = document.getElementById('availability-status');
+            const submitBtn = document.getElementById('submit-btn');
+
+            if (!ci || !co || !roomId) {
+                statusBox.style.display = 'none';
+                return;
+            }
+
+            if (co <= ci) {
+                statusBox.style.display = 'block';
+                statusBox.style.background = '#fef2f2';
+                statusBox.style.border = '1px solid #fecaca';
+                statusBox.style.color = '#dc2626';
+                statusBox.textContent = '⚠️ วันเช็คเอาท์ต้องมากกว่าวันเช็คอิน';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.cursor = 'not-allowed';
+                isRoomAvailable = false;
+                return;
+            }
+
+            statusBox.style.display = 'block';
+            statusBox.style.background = '#f0f9ff';
+            statusBox.style.border = '1px solid #bae6fd';
+            statusBox.style.color = '#0369a1';
+            statusBox.textContent = '⏳ กำลังตรวจสอบห้องว่าง...';
+
+            const url = `../script/checkAvailability.php?room_id=${roomId}&check_in=${ci}&check_out=${co}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.available) {
+                            // ห้องว่าง
+                            statusBox.style.background = '#ecfdf5';
+                            statusBox.style.border = '1px solid #a7f3d0';
+                            statusBox.style.color = '#065f46';
+                            statusBox.textContent = '✅ ห้องว่าง — สามารถจองได้ในช่วงวันที่เลือก';
+                            submitBtn.disabled = false;
+                            submitBtn.style.opacity = '1';
+                            submitBtn.style.cursor = 'pointer';
+                            isRoomAvailable = true;
+                        } else {
+                            // ห้องไม่ว่าง
+                            let msg = '❌ ห้องนี้ถูกจองแล้วในช่วงวันที่เลือก';
+                            if (data.conflicting_bookings && data.conflicting_bookings.length > 0) {
+                                const conflictList = data.conflicting_bookings.map(c => `${c.check_in} ถึง ${c.check_out}`).join(', ');
+                                msg += ` (มีการจองอยู่: ${conflictList})`;
+                            }
+                            statusBox.style.background = '#fef2f2';
+                            statusBox.style.border = '1px solid #fecaca';
+                            statusBox.style.color = '#dc2626';
+                            statusBox.textContent = msg;
+                            submitBtn.disabled = true;
+                            submitBtn.style.opacity = '0.5';
+                            submitBtn.style.cursor = 'not-allowed';
+                            isRoomAvailable = false;
+                        }
+                    }
+                })
+                .catch(() => {
+                    // ถ้าเช็คไม่ได้ ให้อนุญาตจอง (submitBooking.php จะตรวจอีกทีอยู่แล้ว)
+                    statusBox.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                    isRoomAvailable = true;
+                });
+        }
+
+        // ฟังก์ชันคำนวณจำนวนคืนและราคารวมแบบ Real-time + เช็คห้องว่าง
         function calculateTotal() {
             const d1 = new Date(checkInInput.value);
             const d2 = new Date(checkOutInput.value);
@@ -306,9 +396,24 @@
                 document.getElementById('display-nights').textContent = 'วันที่ไม่ถูกต้อง';
                 document.getElementById('display-total').textContent = '0 ฿';
             }
+
+            // เช็คห้องว่าง (debounce 300ms เพื่อไม่ให้เรียก API ถี่เกินไป)
+            clearTimeout(checkTimer);
+            checkTimer = setTimeout(checkAvailability, 300);
         }
 
-        checkInInput.addEventListener('change', calculateTotal);
+        // ปรับ min ของ check-out เมื่อเปลี่ยน check-in
+        checkInInput.addEventListener('change', function () {
+            if (this.value) {
+                const nextDay = new Date(this.value);
+                nextDay.setDate(nextDay.getDate() + 1);
+                checkOutInput.setAttribute('min', nextDay.toISOString().split('T')[0]);
+                if (checkOutInput.value && checkOutInput.value <= this.value) {
+                    checkOutInput.value = nextDay.toISOString().split('T')[0];
+                }
+            }
+            calculateTotal();
+        });
         checkOutInput.addEventListener('change', calculateTotal);
         calculateTotal();
 
@@ -337,6 +442,13 @@
         // ส่งข้อมูลไปยัง submitBooking.php เมื่อกดปุ่มยืนยัน
         document.getElementById('booking-form').addEventListener('submit', function (e) {
             e.preventDefault();
+
+            // ป้องกันซ้ำอีกชั้น: ห้ามส่งถ้าห้องไม่ว่าง
+            if (!isRoomAvailable) {
+                alert('❌ ไม่สามารถจองได้ — ห้องนี้ถูกจองแล้วในช่วงวันที่เลือก\nกรุณาเลือกวันที่อื่นหรือเปลี่ยนห้องพัก');
+                return;
+            }
+
             const formData = new FormData(this);
 
             fetch('../script/submitBooking.php', {
@@ -366,4 +478,3 @@
 </body>
 
 </html>
-
