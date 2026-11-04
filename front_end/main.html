@@ -26,11 +26,11 @@
         </div>
     </nav>
 
-    <section>
-        <div class="photo">
-            <img src="" alt=""> <!--ดึงจากdatabase-->
-        </div>
-    </section>
+        <section>
+            <div class="photo" style="height: 100%; width: 100%;">
+                <img src="photo/hero-bg.jpg" alt="Azure Resort Banner" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </section>
 
     <div class="search_bar">
         <form class="search_bar_container" id="search-form">
@@ -225,7 +225,7 @@
                 const finalPrice = room.is_member_discount
                     ? Number(room.price)
                     : (isMember ? Math.round(rawPrice * 0.85) : rawPrice);
-                const imgSrc = room.image_url || '';
+                const imgSrc = room.path_photo || room.image_url || '';
 
                 const priceDisplayHtml = isMember ? `
                     <div>

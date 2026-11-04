@@ -249,7 +249,7 @@
         // ฟังก์ชั่น render การ์ดห้องพัก (คำนวณส่วนลด 15% เมื่อล็อกอินแล้ว)
         function renderRooms(rooms) {
             const grid = document.getElementById('rooms-grid');
-
+            
             if (rooms.length === 0) {
                 grid.innerHTML = '<p class="no-rooms">ไม่พบห้องพักที่ตรงกับเงื่อนไข</p>';
                 return;
@@ -266,7 +266,7 @@
                 const badgeHtml = room.badge
                     ? `<span class="room-badge">${room.badge}</span>`
                     : '';
-                const imgSrc = room.image_url || '';
+                const imgSrc = room.path_photo || room.image_url || '';
 
                 const priceDisplayHtml = isMember ? `
                     <div class="member-price-box">

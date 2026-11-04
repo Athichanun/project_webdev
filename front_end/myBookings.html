@@ -198,6 +198,7 @@
 
         // ดึงข้อมูลรายการจอง
         function fetchBookings(status) {
+            
             const container = document.getElementById('bookings-list');
             container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 40px;">กำลังโหลดรายการจอง...</p>';
 
@@ -233,7 +234,7 @@
         // แสดงผลรายการจอง
         function renderBookings(bookings, status) {
             const container = document.getElementById('bookings-list');
-
+            
             if (!bookings || bookings.length === 0) {
                 const message = (status === 'Waiting')
                     ? 'ขณะนี้คุณไม่มีรายการจองห้องพักที่อยู่ในระหว่างรอเข้าใช้งาน (Waiting)'
@@ -267,7 +268,7 @@
                     ? new Date(item.Date_booking).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
                     : '-';
 
-                const roomImg = item.image_url || '';
+                const roomImg = item.path_photo || item.image_url || '';
                 const totalPrice = Number(item.total_price).toLocaleString();
 
                 html += `

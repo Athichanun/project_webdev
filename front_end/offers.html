@@ -246,6 +246,86 @@
             });
         }
 
+        // ฟังก์ชันดึงข้อมูลโปรโมชั่นจาก Database มาแสดงผล
+        function fetchPromotions() {
+            fetch('../script/promotions.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data && data.data.length > 0) {
+                        renderPromotions(data.data);
+                    }
+                })
+                .catch(err => console.error('Error loading promotions:', err));
+        }
+
+        function renderPromotions(promos) {
+            const featured = promos.find(p => p.is_featured == 1);
+            const featuredContainer = document.querySelector('.featured-container');
+            if (featured && featuredContainer) {
+                featuredContainer.innerHTML = `
+                    <div class="featured-img">
+                        <img src="${featured.path_photo || ''}" alt="${featured.title}">
+                    </div>
+                    <div class="featured-content">
+                        <span class="offer-tag">${featured.discount_badge || 'ข้อเสนอพิเศษ'}</span>
+                        <h2>${featured.title}</h2>
+                        <p>${featured.description}</p>
+                        <div class="offer-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">📅</span>
+                                <span>${featured.period_text || ''}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">💰</span>
+                                <span>เริ่มต้นเพียง ${Number(featured.sale_price).toLocaleString()} ฿ ${featured.price_unit || ''}</span>
+                            </div>
+                        </div>
+                        <button class="offer-btn" onclick="window.location.href='rooms.html'">จองเลย</button>
+                    </div>
+                `;
+            }
+
+            
+            const grid = document.querySelector('.offers-grid');
+            const normalPromos = promos.filter(p => p.is_featured == 0);
+            if (grid && normalPromos.length > 0) {
+                let html = '';
+                normalPromos.forEach(item => {
+                    const origPriceHtml = item.original_price 
+                        ? `<span class="original-price">${Number(item.original_price).toLocaleString()} ฿</span>` 
+                        : '';
+                    const unitHtml = item.price_unit 
+                        ? `<span class="package-note">${item.price_unit}</span>` 
+                        : '';
+
+                    html += `
+                    <div class="offer-card">
+                        <div class="offer-img">
+                            <img src="${item.path_photo || ''}" alt="${item.title}">
+                            <div class="discount-badge">${item.discount_badge || 'พิเศษ'}</div>
+                        </div>
+                        <div class="offer-info">
+                            <span class="offer-period">${item.period_text || ''}</span>
+                            <h3>${item.title}</h3>
+                            <p>${item.description}</p>
+                            <div class="offer-price">
+                                ${origPriceHtml}
+                                <span class="sale-price">${Number(item.sale_price).toLocaleString()} ฿</span>
+                                ${unitHtml}
+                            </div>
+                            <button class="offer-card-btn" onclick="window.location.href='rooms.html'">ดูรายละเอียด</button>
+                        </div>
+                    </div>`;
+                });
+                grid.innerHTML = html;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            updateNavAuth();
+            fetchPromotions();
+        });
+
         function updateNavAuth() {
             const memberId = getAuthData('memberId');
             const username = getAuthData('username');

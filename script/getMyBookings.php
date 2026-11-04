@@ -33,6 +33,7 @@ try {
                 r.room_name,
                 r.room_type,
                 r.price AS room_price,
+                r.path_photo,
                 r.image_url,
                 r.bed_type,
                 r.max_guests,
