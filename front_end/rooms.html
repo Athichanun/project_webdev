@@ -13,7 +13,8 @@
     <nav>
         <div class="logo">
             <a href="main.html">
-                <img src="photo/logo.png" alt="Azure Resort Logo" style="height: 40px; width: auto; object-fit: contain;">
+                <img src="photo/logo.png" alt="Azure Resort Logo"
+                    style="height: 40px; width: auto; object-fit: contain;">
             </a>
         </div>
         <div class="page_bar">
@@ -29,7 +30,6 @@
         </div>
     </nav>
 
-    <!-- Hero Banner -->
     <section class="hero-banner">
         <div class="hero-overlay">
             <h1>ห้องพักของเรา</h1>
@@ -37,16 +37,17 @@
         </div>
     </section>
 
-    <!-- Filter & Sort Bar (ตำแหน่งและรูปแบบเดียวกับ search ของ main) -->
     <div class="search_bar filter-bar">
         <div class="search_bar_container filter-container">
             <div class="filter-item">
                 <label for="filter-check-in">เช็คอิน</label>
-                <input type="date" id="filter-check-in" style="padding: 9px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem; font-family: 'Sarabun', sans-serif;">
+                <input type="date" id="filter-check-in"
+                    style="padding: 9px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem; font-family: 'Sarabun', sans-serif;">
             </div>
             <div class="filter-item">
                 <label for="filter-check-out">เช็คเอาท์</label>
-                <input type="date" id="filter-check-out" style="padding: 9px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem; font-family: 'Sarabun', sans-serif;">
+                <input type="date" id="filter-check-out"
+                    style="padding: 9px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem; font-family: 'Sarabun', sans-serif;">
             </div>
             <div class="filter-item">
                 <label for="room-type">ประเภทห้อง</label>
@@ -91,25 +92,23 @@
         </div>
     </div>
 
-    <!-- แถบแจ้งเตือนเมื่อกรองตามวันที่ -->
-    <div id="date-filter-notice" style="display: none; max-width: 1200px; margin: 16px auto 0; padding: 10px 20px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; color: #065f46; font-size: 14px; text-align: center;">
+    <div id="date-filter-notice"
+        style="display: none; max-width: 1200px; margin: 16px auto 0; padding: 10px 20px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; color: #065f46; font-size: 14px; text-align: center;">
         ✅ แสดงเฉพาะห้องที่ <strong>ว่าง</strong> ในช่วงวันที่ <span id="date-filter-range"></span>
-        <a href="javascript:void(0)" id="clear-date-filter" style="margin-left: 12px; color: #dc2626; font-weight: bold; text-decoration: underline;">ล้างตัวกรอง</a>
+        <a href="javascript:void(0)" id="clear-date-filter"
+            style="margin-left: 12px; color: #dc2626; font-weight: bold; text-decoration: underline;">ล้างตัวกรอง</a>
     </div>
 
-    <!-- Room Cards (โหลดจาก PHP) -->
     <main class="rooms-main">
         <div class="rooms-result-info">
             <span id="result-count">กำลังโหลด...</span>
         </div>
         <div class="rooms-grid" id="rooms-grid">
-            <!-- ห้องพักจะถูกโหลดจาก PHP ผ่าน JavaScript -->
         </div>
     </main>
 
     <footer>
         <div class="footer-container">
-            <!-- ข้อมูลรีสอร์ท -->
             <div class="footer-col">
                 <h2>Azure Resort</h2>
                 <p>สัมผัสประสบการณ์การพักผ่อนริมทะเลระดับพรีเมียม บรรยากาศเงียบสงบ พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
@@ -121,7 +120,6 @@
                 </div>
             </div>
 
-            <!-- ข้อมูลติดต่อทั้งหมด -->
             <div class="footer-col">
                 <h3>ข้อมูลติดต่อ</h3>
                 <ul class="footer-contact-list">
@@ -132,7 +130,6 @@
                 </ul>
             </div>
 
-            <!-- เวลาทำการ -->
             <div class="footer-col">
                 <h3>เวลาทำการ</h3>
                 <ul class="footer-hours-list">
@@ -144,7 +141,6 @@
                 </ul>
             </div>
 
-            <!-- เมนูลัด -->
             <div class="footer-col">
                 <h3>เมนูลัด</h3>
                 <ul class="footer-links">
@@ -162,7 +158,7 @@
     </footer>
 
     <script>
-        // ฟังก์ชันอ่านค่าผู้ใช้ (รองรับทั้ง Cookie และ LocalStorage เมื่อเปิดไฟล์ HTML ตรงๆ)
+        // ฟังก์ชันอ่านค่าผู้ใช้ 
         function getAuthData(key) {
             const nameEQ = key + "=";
             const ca = document.cookie.split(';');
@@ -174,14 +170,14 @@
         }
 
         function clearAuthData() {
-            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user'];
+            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user', 'old_user'];
             keys.forEach(k => {
                 document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-                try { localStorage.removeItem(k); } catch (e) {}
+                try { localStorage.removeItem(k); } catch (e) { }
             });
         }
 
-        // ตรวจสอบคุกกี้: ถ้าล็อกอินแล้วให้เปลี่ยนเป็นรูปโปรไฟล์
+        // ตรวจสอบคุกกี้
         function updateNavAuth() {
             const memberId = getAuthData('memberId');
             const username = getAuthData('username');
@@ -212,7 +208,7 @@
                     logoutBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         clearAuthData();
-                        fetch('../script/logout.php').catch(() => {}).finally(() => {
+                        fetch('../script/logout.php').catch(() => { }).finally(() => {
                             window.location.href = 'main.html';
                         });
                     });
@@ -222,11 +218,9 @@
             }
         }
 
-        // เก็บวันที่ที่ผู้ใช้กรอกไว้สำหรับส่งไปหน้า booking
         let currentFilterCheckIn = '';
         let currentFilterCheckOut = '';
 
-        // ฟังก์ชั่นหลัก: ดึงข้อมูลห้องพักจาก PHP (รองรับกรองตามช่วงวันที่)
         function fetchRooms() {
             const roomType = document.getElementById('room-type').value;
             const priceRange = document.getElementById('price-range').value;
@@ -236,7 +230,6 @@
             const checkOut = document.getElementById('filter-check-out').value;
             const isMember = !!(getAuthData('memberId') || getAuthData('username'));
 
-            // เก็บค่าวันที่สำหรับส่งต่อไปหน้า booking
             currentFilterCheckIn = checkIn;
             currentFilterCheckOut = checkOut;
 
@@ -246,8 +239,6 @@
                 guests: guests,
                 sort_by: sortBy
             });
-
-            // ถ้ากรอกวันที่ครบทั้งคู่ ให้ส่งไปกรองจาก backend
             if (checkIn && checkOut) {
                 if (checkOut <= checkIn) {
                     alert('⚠️ วันเช็คเอาท์ต้องมากกว่าวันเช็คอิน');
@@ -259,13 +250,16 @@
 
             if (isMember) {
                 params.append('is_member', '1');
+                const oldUserCount = getAuthData('old_user');
+                if (oldUserCount !== null && oldUserCount !== undefined) {
+                    params.append('old_user', oldUserCount);
+                }
             }
 
             const url = `../script/rooms.php?${params.toString()}`;
 
             document.getElementById('result-count').textContent = 'กำลังโหลด...';
 
-            // แสดง/ซ่อนแถบแจ้งเตือนตัวกรองวันที่
             const notice = document.getElementById('date-filter-notice');
             if (checkIn && checkOut && checkOut > checkIn) {
                 document.getElementById('date-filter-range').textContent = `${checkIn} ถึง ${checkOut}`;
@@ -294,28 +288,33 @@
         // ฟังก์ชั่น render การ์ดห้องพัก
         function renderRooms(rooms) {
             const grid = document.getElementById('rooms-grid');
-            
+
             if (rooms.length === 0) {
                 grid.innerHTML = '<p class="no-rooms">ไม่พบห้องพักที่ตรงกับเงื่อนไข</p>';
                 return;
             }
 
             const isMember = !!(getAuthData('memberId') || getAuthData('username'));
+            const oldUserCount = parseInt(getAuthData('old_user') || '0', 10);
             const hasDateFilter = !!(currentFilterCheckIn && currentFilterCheckOut);
 
             let html = '';
             rooms.forEach(room => {
                 const rawPrice = Number(room.original_price || room.price) || 0;
-                const finalPrice = room.is_member_discount
+                const isOldUser = (room.is_old_user === true) || (isMember && oldUserCount > 0);
+                const discountPercent = room.discount_percent !== undefined
+                    ? Number(room.discount_percent)
+                    : (isMember ? (isOldUser ? 20 : 15) : 0);
+                const finalPrice = (room.is_member_discount && room.price)
                     ? Number(room.price)
-                    : (isMember ? Math.round(rawPrice * 0.85) : rawPrice);
+                    : (discountPercent > 0 ? Math.round(rawPrice * (1 - discountPercent / 100)) : rawPrice);
 
+                const discountTagText = isOldUser ? 'สมาชิกเก่า -20%' : 'สมาชิก -15%';
                 const badgeHtml = room.badge
                     ? `<span class="room-badge">${room.badge}</span>`
                     : '';
                 const imgSrc = room.path_photo || room.image_url || '';
 
-                // แสดงป้ายเฉพาะเมื่อกรองวันที่ (ไม่ใช้ is_reserved)
                 const statusBadgeHtml = hasDateFilter
                     ? `<span class="room-status-badge room-status-available">ว่างในช่วงวันที่เลือก ✔</span>`
                     : '';
@@ -324,7 +323,7 @@
                     <div class="member-price-box">
                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
                             <span class="original-price-strike">${rawPrice.toLocaleString()} ฿</span>
-                            <span class="member-discount-tag">สมาชิก -15%</span>
+                            <span class="member-discount-tag" style="${isOldUser ? 'background: #dc2626; color: #fff;' : ''}">${discountTagText}</span>
                         </div>
                         <div style="display: flex; align-items: baseline; gap: 4px;">
                             <span class="member-price-val">${finalPrice.toLocaleString()} ฿</span>
@@ -366,7 +365,7 @@
             grid.innerHTML = html;
         }
 
-        // ฟังก์ชันจัดการเมื่อลูกค้ากดปุ่ม "จองห้องพัก" (ส่งวันที่ที่เลือกไว้ไปด้วย)
+        // ฟังก์ชันจัดการเมื่อลูกค้ากดปุ่ม
         function goToBookingPage(roomId, roomName, price, originalPrice) {
             const params = new URLSearchParams({
                 room_id: roomId,
@@ -376,14 +375,16 @@
             if (originalPrice && originalPrice !== price) {
                 params.append('orig_price', originalPrice);
             }
-            // ส่งวันที่ที่กรองไว้ไปยังหน้า booking เพื่อ Auto-fill
+            const oldUser = getAuthData('old_user');
+            if (oldUser !== null && oldUser !== undefined) {
+                params.append('old_user', oldUser);
+            }
             if (currentFilterCheckIn) params.append('check_in', currentFilterCheckIn);
             if (currentFilterCheckOut) params.append('check_out', currentFilterCheckOut);
 
             window.location.href = `booking.html?${params.toString()}`;
         }
 
-        // ตั้ง min date ของช่องวันที่ให้เป็นวันนี้
         function setMinDates() {
             const today = new Date().toISOString().split('T')[0];
             const checkInEl = document.getElementById('filter-check-in');
@@ -391,13 +392,11 @@
             checkInEl.setAttribute('min', today);
             checkOutEl.setAttribute('min', today);
 
-            // เมื่อเปลี่ยนวัน check-in ให้ปรับ min ของ check-out
             checkInEl.addEventListener('change', function () {
                 if (this.value) {
                     const nextDay = new Date(this.value);
                     nextDay.setDate(nextDay.getDate() + 1);
                     checkOutEl.setAttribute('min', nextDay.toISOString().split('T')[0]);
-                    // ถ้า check-out น้อยกว่า check-in ให้เคลียร์
                     if (checkOutEl.value && checkOutEl.value <= this.value) {
                         checkOutEl.value = nextDay.toISOString().split('T')[0];
                     }
@@ -405,14 +404,12 @@
             });
         }
 
-        // Event listeners
         document.getElementById('filter-btn').addEventListener('click', fetchRooms);
 
         document.querySelectorAll('.filter-container select').forEach(select => {
             select.addEventListener('change', fetchRooms);
         });
 
-        // ปุ่มล้างตัวกรองวันที่
         const clearBtn = document.getElementById('clear-date-filter');
         if (clearBtn) {
             clearBtn.addEventListener('click', function () {
@@ -426,7 +423,6 @@
             updateNavAuth();
             setMinDates();
 
-            // อ่านค่าจาก URL query parameters (ถ้าส่งมาจาก main.html)
             const urlParams = new URLSearchParams(window.location.search);
             const urlCheckIn = urlParams.get('check_in');
             const urlCheckOut = urlParams.get('check_out');

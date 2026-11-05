@@ -13,7 +13,8 @@
     <nav>
         <div class="logo">
             <a href="main.html">
-                <img src="photo/logo.png" alt="Azure Resort Logo" style="height: 40px; width: auto; object-fit: contain;">
+                <img src="photo/logo.png" alt="Azure Resort Logo"
+                    style="height: 40px; width: auto; object-fit: contain;">
             </a>
         </div>
         <div class="page_bar">
@@ -38,17 +39,19 @@
                 <input type="hidden" id="is-member" name="is_member" value="0">
 
                 <div class="form-group">
-                    <label for="cus-name">ชื่อ - นามสกุล ผู้เข้าพัก *</label>
+                    <label for="cus-name" class="required">ชื่อ - นามสกุล ผู้เข้าพัก</label>
                     <input type="text" id="cus-name" name="cus_name" placeholder="เช่น สมชาย ใจดี" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="phone">เบอร์โทรศัพท์ *</label>
-                    <input type="tel" id="phone" name="phone" placeholder="08X-XXX-XXXX" required>
+                    <label for="phone" class="required">เบอร์โทรศัพท์</label>
+                    <input type="tel" id="phone" name="phone" placeholder="08XXXXXXXX" pattern="^0[689]\d{8}$" required
+                        oninput="validatePhoneDOM()">
+                    <span id="phone-error" style="display: none; font-size: 12px; margin-top: 4px;"></span>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">อีเมล *</label>
+                    <label for="email" class="required">อีเมล</label>
                     <input type="email" id="email" name="email" placeholder="example@email.com" required>
                 </div>
 
@@ -63,8 +66,9 @@
                     </div>
                 </div>
 
-                <!-- กล่องแจ้งเตือนสถานะห้องว่าง/ไม่ว่าง (Real-time) -->
-                <div id="availability-status" style="display: none; padding: 10px 14px; border-radius: 6px; font-size: 14px; margin-bottom: 15px; font-weight: bold;"></div>
+                <div id="availability-status"
+                    style="display: none; padding: 10px 14px; border-radius: 6px; font-size: 14px; margin-bottom: 15px; font-weight: bold;">
+                </div>
 
                 <div class="form-group">
                     <label for="payment-method">วิธีการชำระเงิน *</label>
@@ -77,7 +81,8 @@
 
                 <div id="payment-detail-box" class="qr-box">
                     <p style="margin-bottom:8px; font-weight:bold;">สแกน QR Code เพื่อชำระเงิน</p>
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=AzureResortPromptPay" alt="QR Code">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=AzureResortPromptPay"
+                        alt="QR Code">
                     <p style="font-size:13px; color:#666; margin-top:8px;">ชื่อบัญชี: บจก. อะซูร์ รีสอร์ท</p>
                 </div>
 
@@ -88,7 +93,8 @@
         <!-- การ์ดสรุปรายการจอง -->
         <div class="summary-card">
             <h3>สรุปรายการจอง</h3>
-            <div id="member-privilege-banner" style="display: none; background: #fee2e2; border: 1px solid #fecaca; color: #b91c1c; padding: 10px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; margin-bottom: 16px;">
+            <div id="member-privilege-banner"
+                style="display: none; background: #fee2e2; border: 1px solid #fecaca; color: #b91c1c; padding: 10px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; margin-bottom: 16px;">
                 🎉 สิทธิพิเศษสมาชิก: ได้รับส่วนลด 15% ทุกห้องพัก
             </div>
             <div class="summary-item">
@@ -99,7 +105,8 @@
                 <span>ราคาปกติ:</span>
                 <span id="display-orig-price" style="text-decoration: line-through; color: #888;">0 ฿</span>
             </div>
-            <div class="summary-item" id="member-discount-row" style="display: none; color: #dc2626; font-weight: bold;">
+            <div class="summary-item" id="member-discount-row"
+                style="display: none; color: #dc2626; font-weight: bold;">
                 <span>ส่วนลดสมาชิก (15%):</span>
                 <span id="display-discount">-0 ฿</span>
             </div>
@@ -120,7 +127,6 @@
 
     <footer>
         <div class="footer-container">
-            <!-- ข้อมูลรีสอร์ท -->
             <div class="footer-col">
                 <h2>Azure Resort</h2>
                 <p>สัมผัสประสบการณ์การพักผ่อนริมทะเลระดับพรีเมียม บรรยากาศเงียบสงบ พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
@@ -132,7 +138,6 @@
                 </div>
             </div>
 
-            <!-- ข้อมูลติดต่อทั้งหมด -->
             <div class="footer-col">
                 <h3>ข้อมูลติดต่อ</h3>
                 <ul class="footer-contact-list">
@@ -143,7 +148,7 @@
                 </ul>
             </div>
 
-            <!-- เวลาทำการ -->
+
             <div class="footer-col">
                 <h3>เวลาทำการ</h3>
                 <ul class="footer-hours-list">
@@ -155,7 +160,6 @@
                 </ul>
             </div>
 
-            <!-- เมนูลัด -->
             <div class="footer-col">
                 <h3>เมนูลัด</h3>
                 <ul class="footer-links">
@@ -173,7 +177,7 @@
     </footer>
 
     <script>
-        // ฟังก์ชันอ่านค่ายืนยันตัวตน (รองรับทั้ง Cookie และ LocalStorage สำหรับ Live Server / file://)
+        // ฟังก์ชันอ่านค่ายืนยันตัวตน 
         function getAuthData(key) {
             const nameEQ = key + "=";
             const ca = document.cookie.split(';');
@@ -185,14 +189,14 @@
         }
 
         function clearAuthData() {
-            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user'];
+            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user', 'old_user'];
             keys.forEach(k => {
                 document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-                try { localStorage.removeItem(k); } catch (e) {}
+                try { localStorage.removeItem(k); } catch (e) { }
             });
         }
 
-        // ตรวจสอบคุกกี้/Storage: ถ้าล็อกอินแล้วให้เปลี่ยนเป็นรูปโปรไฟล์
+        // ตรวจสอบคุกกี้
         function updateNavAuth() {
             const memberId = getAuthData('memberId');
             const username = getAuthData('username');
@@ -223,7 +227,7 @@
                     logoutBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         clearAuthData();
-                        fetch('../script/logout.php').catch(() => {}).finally(() => {
+                        fetch('../script/logout.php').catch(() => { }).finally(() => {
                             window.location.href = 'main.html';
                         });
                     });
@@ -233,7 +237,25 @@
             }
         }
 
-        // เติมข้อมูลอัตโนมัติจาก Auth Data เมื่อล็อกอินแล้ว
+        function validatePhoneDOM() {
+            const input = document.getElementById('phone');
+            const error = document.getElementById('phone-error');
+            const pattern = /^0[689]\d{8}$/;
+
+            if (!pattern.test(input.value.trim())) {
+                input.style.borderColor = "#ef4444";
+                input.style.backgroundColor = "#fef2f2";
+                error.style.display = "block";
+                error.style.color = "#ef4444";
+                error.textContent = "กรุณากรอกเบอร์โทรศัพท์ 10 หลัก (ขึ้นต้นด้วย 06, 08 หรือ 09)";
+            } else {
+                input.style.borderColor = "#10b981";
+                input.style.backgroundColor = "#f0fdf4";
+                error.style.display = "none";
+            }
+        }
+
+        // เติมข้อมูลอัตโนมัติ
         function autoFillCustomerInfo() {
             const memberId = getAuthData('memberId');
             if (memberId) {
@@ -251,11 +273,17 @@
             }
         }
 
-        // ดึงข้อมูลห้องพักจาก URL
+        // ดึงข้อมูลห้องพัก
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('room_id');
         const roomName = urlParams.get('room_name') || 'ไม่ระบุห้องพัก';
         const isMember = !!(getAuthData('memberId') || getAuthData('username'));
+        const oldUserParam = urlParams.get('old_user');
+        const oldUserCount = oldUserParam !== null
+            ? parseInt(oldUserParam, 10)
+            : parseInt(getAuthData('old_user') || '0', 10);
+        const isOldUser = isMember && oldUserCount > 0;
+        const discountPercent = isMember ? (isOldUser ? 20 : 15) : 0;
 
         let passedPrice = Number(urlParams.get('price')) || 0;
         let origPrice = Number(urlParams.get('orig_price')) || passedPrice;
@@ -265,15 +293,32 @@
             const isMemberInput = document.getElementById('is-member');
             if (isMemberInput) isMemberInput.value = '1';
 
-            // ถ้า URL ยังไม่ได้คิดส่วนลด 15% ให้คำนวณลด 15%
             if (!urlParams.get('orig_price') || origPrice === passedPrice) {
                 origPrice = passedPrice;
-                pricePerNight = Math.round(origPrice * 0.85);
+                pricePerNight = Math.round(origPrice * (100 - discountPercent) / 100);
             }
 
-            document.getElementById('member-privilege-banner').style.display = 'block';
+            const bannerEl = document.getElementById('member-privilege-banner');
+            if (bannerEl) {
+                bannerEl.style.display = 'block';
+                if (isOldUser) {
+                    bannerEl.innerHTML = `🎉 <strong>สิทธิพิเศษสมาชิกเก่า (เคยจองแล้ว):</strong> ได้รับส่วนลดพิเศษ <strong>20%</strong> ทุกห้องพัก (ประวัติการจอง ${oldUserCount} ครั้ง)`;
+                    bannerEl.style.background = '#fef2f2';
+                    bannerEl.style.borderColor = '#fca5a5';
+                    bannerEl.style.color = '#991b1b';
+                } else {
+                    bannerEl.innerHTML = `🎉 <strong>สิทธิพิเศษสมาชิก:</strong> ได้รับส่วนลด <strong>15%</strong> ทุกห้องพัก`;
+                }
+            }
+
+            const discountRow = document.getElementById('member-discount-row');
+            if (discountRow) {
+                const labelSpan = discountRow.querySelector('span:first-child');
+                if (labelSpan) labelSpan.textContent = `ส่วนลดสมาชิก (${discountPercent}%):`;
+                discountRow.style.display = 'flex';
+            }
+
             document.getElementById('orig-price-row').style.display = 'flex';
-            document.getElementById('member-discount-row').style.display = 'flex';
             document.getElementById('display-orig-price').textContent = origPrice.toLocaleString() + ' ฿';
             const discountPerNight = origPrice - pricePerNight;
             document.getElementById('display-discount').textContent = '-' + discountPerNight.toLocaleString() + ' ฿ / คืน';
@@ -285,7 +330,6 @@
         document.getElementById('display-room-name').textContent = roomName;
         document.getElementById('display-price').textContent = pricePerNight.toLocaleString() + ' ฿';
 
-        // ตั้งค่าวันที่เริ่มต้น (ถ้ามีจาก URL ใช้ค่านั้น มิฉะนั้นใช้วันนี้/พรุ่งนี้)
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -299,15 +343,12 @@
         checkInInput.value = urlCheckIn || today.toISOString().split('T')[0];
         checkOutInput.value = urlCheckOut || tomorrow.toISOString().split('T')[0];
 
-        // กำหนด min date
         checkInInput.setAttribute('min', today.toISOString().split('T')[0]);
         checkOutInput.setAttribute('min', today.toISOString().split('T')[0]);
 
-        // สถานะ: ห้องว่างหรือไม่ (ป้องกันการส่งฟอร์มเมื่อห้องไม่ว่าง)
         let isRoomAvailable = true;
         let checkTimer = null;
 
-        // ฟังก์ชันเช็คห้องว่าง Real-time (เรียก API checkAvailability.php)
         function checkAvailability() {
             const ci = checkInInput.value;
             const co = checkOutInput.value;
@@ -338,51 +379,56 @@
             statusBox.style.color = '#0369a1';
             statusBox.textContent = '⏳ กำลังตรวจสอบห้องว่าง...';
 
-            const url = `../script/checkAvailability.php?room_id=${roomId}&check_in=${ci}&check_out=${co}`;
+            const xhr = new XMLHttpRequest();
+            const url = `../script/checkAvailability.php?room_id=${encodeURIComponent(roomId)}&check_in=${encodeURIComponent(ci)}&check_out=${encodeURIComponent(co)}`;
+            xhr.open("GET", url, true);
 
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        if (data.available) {
-                            // ห้องว่าง
-                            statusBox.style.background = '#ecfdf5';
-                            statusBox.style.border = '1px solid #a7f3d0';
-                            statusBox.style.color = '#065f46';
-                            statusBox.textContent = '✅ ห้องว่าง — สามารถจองได้ในช่วงวันที่เลือก';
-                            submitBtn.disabled = false;
-                            submitBtn.style.opacity = '1';
-                            submitBtn.style.cursor = 'pointer';
-                            isRoomAvailable = true;
-                        } else {
-                            // ห้องไม่ว่าง
-                            let msg = '❌ ห้องนี้ถูกจองแล้วในช่วงวันที่เลือก';
-                            if (data.conflicting_bookings && data.conflicting_bookings.length > 0) {
-                                const conflictList = data.conflicting_bookings.map(c => `${c.check_in} ถึง ${c.check_out}`).join(', ');
-                                msg += ` (มีการจองอยู่: ${conflictList})`;
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            const data = JSON.parse(xhr.responseText);
+
+                            if (data.success && data.available) {
+                                statusBox.style.background = '#ecfdf5';
+                                statusBox.style.border = '1px solid #a7f3d0';
+                                statusBox.style.color = '#065f46';
+                                statusBox.textContent = '✅ ห้องว่าง — สามารถจองได้ในช่วงวันที่เลือก';
+                                submitBtn.disabled = false;
+                                submitBtn.style.opacity = '1';
+                                submitBtn.style.cursor = 'pointer';
+                                isRoomAvailable = true;
+                            } else {
+                                let msg = '❌ ห้องนี้ถูกจองแล้วในช่วงวันที่เลือก';
+                                if (data.conflicting_bookings && data.conflicting_bookings.length > 0) {
+                                    const conflictList = data.conflicting_bookings.map(c => `${c.check_in} ถึง ${c.check_out}`).join(', ');
+                                    msg += ` (มีการจองอยู่: ${conflictList})`;
+                                }
+                                statusBox.style.background = '#fef2f2';
+                                statusBox.style.border = '1px solid #fecaca';
+                                statusBox.style.color = '#dc2626';
+                                statusBox.textContent = msg;
+                                submitBtn.disabled = true;
+                                submitBtn.style.opacity = '0.5';
+                                submitBtn.style.cursor = 'not-allowed';
+                                isRoomAvailable = false;
                             }
-                            statusBox.style.background = '#fef2f2';
-                            statusBox.style.border = '1px solid #fecaca';
-                            statusBox.style.color = '#dc2626';
-                            statusBox.textContent = msg;
-                            submitBtn.disabled = true;
-                            submitBtn.style.opacity = '0.5';
-                            submitBtn.style.cursor = 'not-allowed';
-                            isRoomAvailable = false;
+                        } catch (err) {
+                            console.error("Error parsing responseText:", xhr.responseText);
                         }
+                    } else {
+                        statusBox.style.display = 'none';
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.cursor = 'pointer';
+                        isRoomAvailable = true;
                     }
-                })
-                .catch(() => {
-                    // ถ้าเช็คไม่ได้ ให้อนุญาตจอง (submitBooking.php จะตรวจอีกทีอยู่แล้ว)
-                    statusBox.style.display = 'none';
-                    submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
-                    submitBtn.style.cursor = 'pointer';
-                    isRoomAvailable = true;
-                });
+                }
+            };
+            xhr.send();
         }
 
-        // ฟังก์ชันคำนวณจำนวนคืนและราคารวมแบบ Real-time + เช็คห้องว่าง
+        // ฟังก์ชันคำนวณจำนวนคืนและราคารวมแ
         function calculateTotal() {
             const d1 = new Date(checkInInput.value);
             const d2 = new Date(checkOutInput.value);
@@ -397,12 +443,10 @@
                 document.getElementById('display-total').textContent = '0 ฿';
             }
 
-            // เช็คห้องว่าง (debounce 300ms เพื่อไม่ให้เรียก API ถี่เกินไป)
             clearTimeout(checkTimer);
             checkTimer = setTimeout(checkAvailability, 300);
         }
 
-        // ปรับ min ของ check-out เมื่อเปลี่ยน check-in
         checkInInput.addEventListener('change', function () {
             if (this.value) {
                 const nextDay = new Date(this.value);
@@ -417,7 +461,6 @@
         checkOutInput.addEventListener('change', calculateTotal);
         calculateTotal();
 
-        // สลับการแสดงผลช่องชำระเงิน
         function togglePaymentBox() {
             const method = document.getElementById('payment-method').value;
             const box = document.getElementById('payment-detail-box');
@@ -439,35 +482,46 @@
             }
         }
 
-        // ส่งข้อมูลไปยัง submitBooking.php เมื่อกดปุ่มยืนยัน
         document.getElementById('booking-form').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            // ป้องกันซ้ำอีกชั้น: ห้ามส่งถ้าห้องไม่ว่าง
             if (!isRoomAvailable) {
                 alert('❌ ไม่สามารถจองได้ — ห้องนี้ถูกจองแล้วในช่วงวันที่เลือก\nกรุณาเลือกวันที่อื่นหรือเปลี่ยนห้องพัก');
                 return;
             }
 
             const formData = new FormData(this);
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "../script/submitBooking.php", true);
 
-            fetch('../script/submitBooking.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`🎉 จองและทำรายการสำเร็จ!\nรหัสการจอง: #${data.booking_id}\nสถานะการชำระเงิน: ${data.payment_status}\nยอดรวมทั้งสิ้น: ${Number(data.total_price).toLocaleString()} บาท`);
-                    window.location.href = 'rooms.html';
-                } else {
-                    alert('❌ เกิดข้อผิดพลาด: ' + data.message);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            const data = JSON.parse(xhr.responseText);
+
+                            if (data.success) {
+                                if (data.old_user !== undefined) {
+                                    document.cookie = `old_user=${data.old_user}; path=/; max-age=2592000; SameSite=Lax`;
+                                    try { localStorage.setItem('old_user', String(data.old_user)); } catch (e) { }
+                                }
+                                const discountMsg = data.discount_percent > 0 ? `\nส่วนลดสมาชิก: ${data.discount_percent}%` : '';
+                                alert(`🎉 จองและทำรายการสำเร็จ!\nรหัสการจอง: #${data.booking_id}${discountMsg}\nสถานะการชำระเงิน: ${data.payment_status}\nยอดรวมทั้งสิ้น: ${Number(data.total_price).toLocaleString()} บาท`);
+                                window.location.href = 'rooms.html';
+                            } else {
+                                alert('❌ เกิดข้อผิดพลาด: ' + data.message);
+                            }
+                        } catch (err) {
+                            console.error("Error parsing responseText:", xhr.responseText);
+                            alert('เกิดข้อผิดพลาดในการรับข้อมูลจากเซิร์ฟเวอร์');
+                        }
+                    } else {
+                        alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ (Status: ' + xhr.status + ')');
+                    }
                 }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
-            });
+            };
+
+            xhr.send(formData);
         });
 
         document.addEventListener('DOMContentLoaded', function () {

@@ -1,10 +1,4 @@
 <?php
-/**
- * checkAvailability.php
- * ตรวจสอบว่าห้องพักว่างในช่วงวันที่ที่ระบุหรือไม่ (Real-time)
- * รับ: room_id, check_in, check_out (GET)
- * ส่งกลับ: { available: true/false, conflicting_dates: [...] }
- */
 ob_start();
 header('Content-Type: application/json; charset=utf-8');
 include "mainConnect.php";
@@ -18,7 +12,7 @@ if (empty($roomId) || empty($checkIn) || empty($checkOut)) {
     exit();
 }
 
-// ตรวจสอบรูปแบบวันที่
+
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $checkIn) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $checkOut)) {
     echo json_encode(["success" => false, "message" => "รูปแบบวันที่ไม่ถูกต้อง (ใช้ YYYY-MM-DD)"]);
     exit();
@@ -30,8 +24,6 @@ if ($checkOut <= $checkIn) {
 }
 
 try {
-    // ค้นหาการจองที่ทับซ้อนกับช่วงวันที่ต้องการ
-    // overlap condition: existing.check_in < new.check_out AND existing.check_out > new.check_in
     $sql = "SELECT booking_id, check_in, check_out, payment_status 
             FROM Booking 
             WHERE room_id = ? 
@@ -45,7 +37,6 @@ try {
 
     $isAvailable = (count($conflicts) === 0);
 
-    // สร้างรายการวันที่ซ้ำ (สำหรับแสดงให้ผู้ใช้เห็น)
     $conflictingDates = [];
     foreach ($conflicts as $c) {
         $conflictingDates[] = [

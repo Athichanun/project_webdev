@@ -17,11 +17,14 @@
             <form action="../script/register.php" method="POST" id="register-form">
                 <input type="text" name="cus_name" id="cus_name" placeholder="ชื่อ - นามสกุล *"
                     pattern="[ก-๙]+(?:\s+[ก-๙]+)+"
-                    title="กรุณากรอกชื่อและนามสกุลเป็นภาษาไทย โดยเว้นวรรคระหว่างชื่อและนามสกุล เช่น สมชาย ใจดี" required>
+                    title="กรุณากรอกชื่อและนามสกุลเป็นภาษาไทย โดยเว้นวรรคระหว่างชื่อและนามสกุล เช่น สมชาย ใจดี"
+                    required>
 
                 <input type="tel" name="phone" id="phone" placeholder="เบอร์โทรศัพท์ (เช่น 0812345678) *"
-                    pattern="0[689]\d{8}"
-                    title="เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 06, 08 หรือ 09 และมีความยาว 10 หลัก (เช่น 0812345678)" required>
+                    pattern="^0[689]\d{8}$"
+                    title="เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 06, 08 หรือ 09 และมีความยาว 10 หลัก (เช่น 0812345678)" required
+                    oninput="validatePhoneDOM()">
+                <span id="phone-error" style="display: none; font-size: 12px; margin-top: 4px;"></span>
 
                 <input type="email" name="email" id="email" placeholder="อีเมล (example@email.com) *"
                     pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
@@ -41,7 +44,23 @@
     </div>
 
     <script>
-        // ตรวจสอบเฉพาะรหัสผ่านตรงกันก่อนส่งฟอร์ม (ส่วน pattern ให้ HTML และ CSS จัดการ)
+        function validatePhoneDOM() {
+            const input = document.getElementById('phone');
+            const error = document.getElementById('phone-error');
+            const pattern = /^0[689]\d{8}$/;
+
+            if (!pattern.test(input.value.trim())) {
+                input.style.borderColor = "#ef4444";
+                input.style.backgroundColor = "#fef2f2";
+                error.style.display = "block";
+                error.style.color = "#ef4444";
+                error.textContent = "กรุณากรอกเบอร์โทรศัพท์ 10 หลัก (ขึ้นต้นด้วย 06, 08 หรือ 09)";
+            } else {
+                input.style.borderColor = "#10b981";
+                input.style.backgroundColor = "#f0fdf4";
+                error.style.display = "none";
+            }
+        }
         document.getElementById('register-form').addEventListener('submit', function (e) {
             const pass = document.getElementById('password').value;
             const confirmPass = document.getElementById('confirm-password').value;
@@ -54,7 +73,6 @@
                 return;
             }
 
-            // ถ้าเป็นการรันแบบไฟล์ HTML ธรรมดา (file:/// หรือ Live Server port 5500)
             if (window.location.protocol === 'file:' || window.location.port === '5500' || window.location.port === '3000') {
                 e.preventDefault();
                 const cus_name = this.elements['cus_name'].value;
@@ -80,8 +98,6 @@
                 window.location.href = 'main.html';
             }
         });
-
-        // แสดงข้อความแจ้งเตือนจาก URL
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');
         const errorBox = document.getElementById('error-box');

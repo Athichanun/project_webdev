@@ -10,11 +10,11 @@
 </head>
 
 <body>
-    <!-- Navbar -->
     <nav>
         <div class="logo">
             <a href="main.html">
-                <img src="photo/logo.png" alt="Azure Resort Logo" style="height: 40px; width: auto; object-fit: contain;">
+                <img src="photo/logo.png" alt="Azure Resort Logo"
+                    style="height: 40px; width: auto; object-fit: contain;">
             </a>
         </div>
         <div class="page_bar">
@@ -31,21 +31,17 @@
     </nav>
 
     <div class="bookings-page">
-        <!-- Hero Banner -->
         <section class="bookings-hero">
             <h1>รายการจองห้องพักของฉัน</h1>
             <p>MY BOOKINGS & RESERVATIONS</p>
         </section>
 
-        <!-- Main Content -->
         <div class="bookings-container">
-            <!-- ข้อมูลผู้ใช้งาน -->
             <div class="user-card">
                 <div class="user-card-left">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" 
-                         alt="User Profile" 
-                         class="user-card-avatar"
-                         onerror="this.onerror=null; this.src='user-avatar.svg';">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80"
+                        alt="User Profile" class="user-card-avatar"
+                        onerror="this.onerror=null; this.src='user-avatar.svg';">
                     <div class="user-card-info">
                         <h2 id="user-display-name">ผู้ใช้งาน</h2>
                         <p id="user-display-email">กำลังโหลดข้อมูล...</p>
@@ -56,7 +52,6 @@
                 </div>
             </div>
 
-            <!-- แถบเลือกสถานะ (Tabs) -->
             <div class="tabs-container">
                 <button class="tab-btn active" id="tab-waiting" onclick="switchTab('Waiting')">
                     ⏳ กำลังรอเข้าใช้งาน (Waiting)
@@ -68,15 +63,13 @@
                 </button>
             </div>
 
-            <!-- รายการการจอง -->
             <div class="bookings-list" id="bookings-list">
-                <!-- โหลดการ์ดการจองผ่าน JavaScript -->
                 <p style="text-align: center; color: #64748b; padding: 40px;">กำลังโหลดรายการจองของคุณ...</p>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
+
     <footer>
         <div class="footer-container">
             <div class="footer-col">
@@ -128,7 +121,7 @@
     </footer>
 
     <script>
-        // ฟังก์ชันอ่านค่าผู้ใช้ (รองรับทั้ง Cookie และ LocalStorage เมื่อเปิดไฟล์ HTML ตรงๆ)
+        // ฟังก์ชันอ่านค่าผู้ใช้
         function getAuthData(key) {
             const nameEQ = key + "=";
             const ca = document.cookie.split(';');
@@ -140,10 +133,10 @@
         }
 
         function clearAuthData() {
-            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user'];
+            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user', 'old_user'];
             keys.forEach(k => {
                 document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-                try { localStorage.removeItem(k); } catch (e) {}
+                try { localStorage.removeItem(k); } catch (e) { }
             });
         }
 
@@ -178,7 +171,7 @@
                     logoutBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         clearAuthData();
-                        fetch('../script/logout.php').catch(() => {}).finally(() => {
+                        fetch('../script/logout.php').catch(() => { }).finally(() => {
                             window.location.href = 'main.html';
                         });
                     });
@@ -190,7 +183,6 @@
 
         let currentTab = 'Waiting';
 
-        // สลับแท็บตัวกรอง
         function switchTab(status) {
             currentTab = status;
             document.getElementById('tab-waiting').classList.toggle('active', status === 'Waiting');
@@ -198,9 +190,10 @@
             fetchBookings(status);
         }
 
-        // ดึงข้อมูลรายการจอง
+        let currentStatusFilter = 'Waiting';
+
         function fetchBookings(status) {
-            
+            currentStatusFilter = status;
             const container = document.getElementById('bookings-list');
             container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 40px;">กำลังโหลดรายการจอง...</p>';
 
@@ -236,7 +229,7 @@
         // แสดงผลรายการจอง
         function renderBookings(bookings, status) {
             const container = document.getElementById('bookings-list');
-            
+
             if (!bookings || bookings.length === 0) {
                 const message = (status === 'Waiting')
                     ? 'ขณะนี้คุณไม่มีรายการจองห้องพักที่อยู่ในระหว่างรอเข้าใช้งาน (Waiting)'
@@ -266,7 +259,7 @@
                 const checkInStr = checkInDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
                 const checkOutStr = checkOutDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
 
-                const bookingDateStr = item.Date_booking 
+                const bookingDateStr = item.Date_booking
                     ? new Date(item.Date_booking).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
                     : '-';
 
@@ -312,6 +305,9 @@
                             <div class="booking-guest-info">
                                 👤 ผู้เข้าพัก: <strong>${item.cus_name || '-'}</strong> | 📞 ${item.phone || '-'}
                                 <br><small style="color: #94a3b8;">ทำรายการเมื่อ: ${bookingDateStr}</small>
+                                <div style="margin-top: 8px;">
+                                    <button class="btn-cancel" onclick="cancelBooking(${item.booking_id})" style="background-color: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; font-family: inherit;">🗑️ ยกเลิกการจอง</button>
+                                </div>
                             </div>
                             <div class="booking-price-total">
                                 <span class="label">ยอดชำระสุทธิ:</span>
@@ -325,7 +321,30 @@
             container.innerHTML = html;
         }
 
-        // ดึงจำนวนรายการนับทั้ง Waiting และ All
+        // ฟังก์ชันยกเลิกการจอง
+        function cancelBooking(bookingId) {
+            if (!confirm(`คุณต้องการยกเลิกการจองรหัส #${bookingId} ใช่หรือไม่?`)) return;
+
+            const formData = new FormData();
+            formData.append('booking_id', bookingId);
+
+            fetch('../script/cancelBooking.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message || 'ยกเลิกรายการจองสำเร็จ');
+                        fetchBookings(currentStatusFilter);
+                        updateCounts();
+                    } else {
+                        alert('เกิดข้อผิดพลาด: ' + data.message);
+                    }
+                })
+                .catch(() => alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'));
+        }
+
         function updateCounts() {
             fetch('../script/getMyBookings.php?status=Waiting')
                 .then(r => r.json())
@@ -339,13 +358,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             const memberId = getAuthData('memberId');
             if (!memberId) {
-                // ถ้ายังไม่ล็อกอิน ให้ดีดไปหน้า login
                 alert('กรุณาเข้าสู่ระบบก่อนดูรายการจอง');
                 window.location.href = 'logIn.html';
                 return;
             }
-
-            // แสดงชื่อและอีเมลใน Card
             const cusName = getAuthData('cus_name') || getAuthData('username') || 'ผู้ใช้งาน';
             const email = getAuthData('email') || '';
             const phone = getAuthData('phone') || '';
@@ -360,4 +376,3 @@
 </body>
 
 </html>
-

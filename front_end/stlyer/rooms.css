@@ -1,11 +1,13 @@
-/* ==================== Rooms Page Styles ==================== */
-
+/* ==================== Hero Banner (Mobile-First) ==================== */
 .hero-banner {
     background-color: #14a2e4;
-    height: 300px;
+    height: 180px;
+    min-height: 160px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 20px 16px;
+    position: relative;
 }
 
 .hero-overlay {
@@ -14,52 +16,48 @@
 }
 
 .hero-overlay h1 {
-    font-size: 2.5rem;
-    margin-bottom: 8px;
+    font-size: 1.8rem;
+    margin-bottom: 6px;
 }
 
 .hero-overlay p {
-    font-size: 1rem;
-    letter-spacing: 3px;
-    opacity: 0.8;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    opacity: 0.85;
 }
 
-.nav-links li a.active {
-    color: #14a2e4;
-    border-bottom: 2px solid #14a2e4;
-    padding-bottom: 4px;
-}
-
-/* Filter & Search Bar - รูปแบบและตำแหน่งเดียวกับ search ของ main */
+/* ==================== Filter & Search Bar ==================== */
 .filter-bar,
 .search_bar {
-    border: none;
+    width: 100%;
+    padding: 0 16px;
     display: flex;
-    align-items: center;
     justify-content: center;
     background-color: transparent;
-    padding: 0;
+    border: none;
 }
 
 .filter-container,
 .search_bar_container {
+    width: 100%;
+    max-width: 480px;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 12px 24px;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
     position: relative;
-    margin-top: -30px;
+    margin-top: -24px;
     background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
     z-index: 10;
 }
 
 .filter-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
+    width: 100%;
 }
 
 .filter-item label {
@@ -68,73 +66,92 @@
     color: #555;
 }
 
-.filter-item select {
-    padding: 10px 16px;
+.filter-item select,
+.filter-item input {
+    width: 100%;
+    min-width: unset;
+    padding: 10px 12px;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 0.9rem;
     font-family: 'Sarabun', sans-serif;
     cursor: pointer;
-    min-width: 160px;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.2s;
 }
 
-.filter-item select:focus {
-    outline: none;
+.filter-item select:focus,
+.filter-item input:focus {
     border-color: #14a2e4;
 }
 
 .filter-btn {
+    width: 100%;
     background-color: #14a2e4;
     color: white;
-    padding: 10px 24px;
+    padding: 12px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
     font-family: 'Sarabun', sans-serif;
-    font-size: 0.9rem;
-    height: 42px;
+    font-size: 0.95rem;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    white-space: nowrap;
     transition: background-color 0.2s;
+    margin-top: 4px;
 }
 
 .filter-btn:hover {
     background-color: #1190cc;
 }
 
+/* ==================== Rooms Grid Layout ==================== */
 .rooms-main {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 24px 16px;
+    width: 100%;
+}
+
+.rooms-result-info {
+    margin-bottom: 14px;
+    color: #64748b;
+    font-size: 0.9rem;
 }
 
 .rooms-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    grid-template-columns: 1fr;
+    gap: 18px;
 }
 
+/* Room Card */
 .room-card {
     background-color: #fff;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
     transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
 }
 
 .room-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
 .room-img {
     position: relative;
-    height: 220px;
-    background-color: #e0e0e0;
+    height: 190px;
+    background-color: #e2e8f0;
     overflow: hidden;
+    width: 100%;
 }
 
 .room-img img {
@@ -145,26 +162,26 @@
 
 .room-badge {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 10px;
+    left: 10px;
     background-color: #14a2e4;
     color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-/* ป้ายสถานะความว่างของห้องพัก */
-.room-status-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: bold;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.room-status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .room-status-available {
@@ -173,43 +190,48 @@
 }
 
 .room-info {
-    padding: 20px;
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .room-info h3 {
-    font-size: 1.3rem;
-    margin-bottom: 8px;
-    color: #333;
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    color: #1e293b;
 }
 
 .room-desc {
-    color: #666;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    margin-bottom: 14px;
+    color: #64748b;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
 }
 
 .room-amenities {
     display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 14px;
     flex-wrap: wrap;
 }
 
 .room-amenities span {
-    font-size: 0.85rem;
-    color: #555;
-    background-color: #f5f5f5;
-    padding: 4px 10px;
+    font-size: 0.8rem;
+    color: #475569;
+    background-color: #f1f5f9;
+    padding: 4px 8px;
     border-radius: 4px;
 }
 
 .room-footer {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 14px;
-    border-top: 1px solid #eee;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
 }
 
 .room-price {
@@ -218,7 +240,6 @@
     gap: 4px;
 }
 
-/* สไตล์แสดงราคาพิเศษสำหรับสมาชิก (ลด 15%) */
 .member-price-box {
     display: flex;
     flex-direction: column;
@@ -229,7 +250,7 @@
     background-color: #fee2e2;
     color: #dc2626;
     font-size: 11px;
-    padding: 2px 7px;
+    padding: 2px 6px;
     border-radius: 4px;
     font-weight: bold;
     display: inline-flex;
@@ -244,49 +265,132 @@
 }
 
 .member-price-val {
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     font-weight: bold;
     color: #dc2626;
 }
 
 .price {
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     font-weight: bold;
     color: #14a2e4;
 }
 
 .per-night {
     font-size: 0.85rem;
-    color: #999;
+    color: #94a3b8;
 }
 
 .book-btn {
+    width: 100%;
     background-color: #14a2e4;
     color: white;
-    padding: 10px 20px;
+    padding: 11px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
     font-family: 'Sarabun', sans-serif;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
 }
 
 .book-btn:hover {
     background-color: #1190cc;
 }
 
-/* Result Info */
-.rooms-result-info {
-    margin-bottom: 16px;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-/* No Rooms Message */
 .no-rooms {
     text-align: center;
-    color: #999;
-    padding: 60px 20px;
-    font-size: 1.1rem;
+    color: #94a3b8;
+    padding: 50px 16px;
+    font-size: 1rem;
     grid-column: 1 / -1;
+}
+
+
+/* mobile*/
+@media (min-width: 640px) {
+    .rooms-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .room-footer {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .book-btn {
+        width: auto;
+        padding: 10px 20px;
+    }
+}
+
+
+/* laptop */
+@media (min-width: 768px) {
+    .hero-banner {
+        height: 280px;
+    }
+
+    .hero-overlay h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-overlay p {
+        font-size: 1rem;
+    }
+
+    .filter-container,
+    .search_bar_container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: auto;
+        max-width: 1200px;
+        margin-top: -30px;
+        padding: 14px 24px;
+        gap: 16px;
+        align-items: flex-end;
+    }
+
+    .filter-item {
+        flex: 1;
+        min-width: 130px;
+    }
+
+    .filter-item select {
+        min-width: 130px;
+    }
+
+    .filter-btn {
+        width: auto;
+        min-width: 110px;
+        height: 42px;
+        padding: 10px 24px;
+        margin-top: 0;
+    }
+
+    .rooms-main {
+        padding: 40px 20px;
+    }
+
+    .room-img {
+        height: 220px;
+    }
+}
+
+
+/* desktop */
+@media (min-width: 1024px) {
+    .rooms-grid {
+        gap: 28px;
+    }
+
+    .room-img {
+        height: 240px;
+    }
 }

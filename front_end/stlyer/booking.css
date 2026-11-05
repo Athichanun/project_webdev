@@ -1,79 +1,167 @@
 .booking-container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 25px;
-        }
-        .form-card, .summary-card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .form-card h2, .summary-card h3 {
-            margin-bottom: 20px;
-            color: #333;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-            color: #555;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
-            box-sizing: border-box;
-        }
-        .date-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            color: #555;
-        }
-        .total-price {
-            font-size: 20px;
-            font-weight: bold;
-            color: #14a2e4;
-            border-top: 2px solid #eee;
-            padding-top: 15px;
-            margin-top: 15px;
-        }
-        .qr-box {
-            text-align: center;
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-            border: 1px dashed #ccc;
-        }
-        .submit-pay-btn {
-            width: 100%;
-            background: #14a2e4;
-            color: #fff;
-            border: none;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-        .submit-pay-btn:hover {
-            background: #0f8bc4;
-        }
+    width: 100%;
+    margin: 16px auto;
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    box-sizing: border-box;
+}
+
+.form-card,
+.summary-card {
+    background: #ffffff;
+    padding: 18px 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-card h2,
+.summary-card h3 {
+    margin-bottom: 16px;
+    color: #1e293b;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 0.88rem;
+    color: #475569;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: 'Sarabun', sans-serif;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #14a2e4;
+    box-shadow: 0 0 0 3px rgba(20, 162, 228, 0.15);
+}
+
+.date-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.summary-item strong {
+    color: #1e293b;
+}
+
+.total-price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #14a2e4;
+    border-top: 2px solid #f1f5f9;
+    padding-top: 14px;
+    margin-top: 14px;
+}
+
+.qr-box {
+    text-align: center;
+    background: #f8fafc;
+    padding: 14px;
+    border-radius: 8px;
+    margin-top: 12px;
+    border: 1px dashed #cbd5e1;
+}
+
+.qr-box img {
+    max-width: 140px;
+    height: auto;
+    margin: 8px auto;
+    display: block;
+}
+
+.submit-pay-btn {
+    width: 100%;
+    background: #14a2e4;
+    color: #ffffff;
+    border: none;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 16px;
+    font-family: 'Sarabun', sans-serif;
+    transition: background-color 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.submit-pay-btn:hover {
+    background: #0d8bc5;
+}
+
+.submit-pay-btn:active {
+    transform: scale(0.99);
+}
+
+
+/* mobile*/
+@media (min-width: 480px) {
+    .date-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+}
+
+
+/* laptop */
+@media (min-width: 768px) {
+    .booking-container {
+        max-width: 960px;
+        margin: 36px auto;
+        padding: 20px;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 25px;
+    }
+
+    .form-card,
+    .summary-card {
+        padding: 25px;
+    }
+
+    .form-card h2,
+    .summary-card h3 {
+        font-size: 1.35rem;
+        margin-bottom: 20px;
+    }
+
+    .total-price {
+        font-size: 1.35rem;
+    }
+}

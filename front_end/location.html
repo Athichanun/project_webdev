@@ -13,7 +13,8 @@
     <nav>
         <div class="logo">
             <a href="main.html">
-                <img src="photo/logo.png" alt="Azure Resort Logo" style="height: 40px; width: auto; object-fit: contain;">
+                <img src="photo/logo.png" alt="Azure Resort Logo"
+                    style="height: 40px; width: auto; object-fit: contain;">
             </a>
         </div>
         <div class="page_bar">
@@ -130,7 +131,6 @@
 
     <footer>
         <div class="footer-container">
-            <!-- ข้อมูลรีสอร์ท -->
             <div class="footer-col">
                 <h2>Azure Resort</h2>
                 <p>สัมผัสประสบการณ์การพักผ่อนริมทะเลระดับพรีเมียม บรรยากาศเงียบสงบ พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
@@ -142,7 +142,6 @@
                 </div>
             </div>
 
-            <!-- ข้อมูลติดต่อทั้งหมด -->
             <div class="footer-col">
                 <h3>ข้อมูลติดต่อ</h3>
                 <ul class="footer-contact-list">
@@ -153,7 +152,6 @@
                 </ul>
             </div>
 
-            <!-- เวลาทำการ -->
             <div class="footer-col">
                 <h3>เวลาทำการ</h3>
                 <ul class="footer-hours-list">
@@ -165,7 +163,6 @@
                 </ul>
             </div>
 
-            <!-- เมนูลัด -->
             <div class="footer-col">
                 <h3>เมนูลัด</h3>
                 <ul class="footer-links">
@@ -194,10 +191,10 @@
         }
 
         function clearAuthData() {
-            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user'];
+            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user', 'old_user'];
             keys.forEach(k => {
                 document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-                try { localStorage.removeItem(k); } catch (e) {}
+                try { localStorage.removeItem(k); } catch (e) { }
             });
         }
 
@@ -231,7 +228,7 @@
                     logoutBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         clearAuthData();
-                        fetch('../script/logout.php').catch(() => {}).finally(() => {
+                        fetch('../script/logout.php').catch(() => { }).finally(() => {
                             window.location.href = 'main.html';
                         });
                     });
@@ -246,4 +243,3 @@
 </body>
 
 </html>
-

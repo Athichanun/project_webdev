@@ -11,7 +11,8 @@
 <body>
     <div class="page">
         <div class="container">
-            <img class="logo" src="photo/logo.png" alt="Azure Resort Logo" style="height: 40px; width: auto; object-fit: contain;">
+            <img id="logo" src="photo/logo.png" alt="Azure Resort Logo"
+                style="height: 40px; width: auto; object-fit: contain;">
             <h2>Login</h2>
             <form action="../script/login.php" method="POST" id="login-form">
                 <input type="text" name="username" id="username" placeholder="Username" required>
@@ -27,7 +28,6 @@
     </div>
 
     <script>
-        // แสดงข้อความแจ้งเตือนเมื่อชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้องจาก PHP
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('error') === 'invalid') {
             const errorBox = document.getElementById('error-box');
@@ -36,14 +36,12 @@
             }
         }
 
-        // จัดการเมื่อกดปุ่ม Login
         document.getElementById('login-form').addEventListener('submit', function (e) {
-            const isStaticMode = (window.location.protocol === 'file:' || 
-                                  window.location.port === '5500' || 
-                                  window.location.port === '3000' || 
-                                  window.location.port === '5501');
+            const isStaticMode = (window.location.protocol === 'file:' ||
+                window.location.port === '5500' ||
+                window.location.port === '3000' ||
+                window.location.port === '5501');
 
-            // หากเป็นการรันแบบไฟล์ HTML ธรรมดา (VS Code Run / Live Server) ที่ไม่มี PHP Engine
             if (isStaticMode) {
                 e.preventDefault();
                 const user = document.getElementById('username').value.trim();
@@ -54,7 +52,6 @@
                     return;
                 }
 
-                // บันทึก Session เข้า Cookie และ LocalStorage เพื่อให้ Navbar อัปเดตเป็นรูปโปรไฟล์
                 document.cookie = `memberId=1; path=/; max-age=86400;`;
                 document.cookie = `username=${encodeURIComponent(user)}; path=/; max-age=86400;`;
                 document.cookie = `cus_name=${encodeURIComponent(user)}; path=/; max-age=86400;`;
@@ -63,11 +60,10 @@
                     localStorage.setItem('memberId', '1');
                     localStorage.setItem('username', user);
                     localStorage.setItem('cus_name', user);
-                } catch (err) {}
+                } catch (err) { }
 
                 window.location.href = 'main.html';
             }
-            // หากรันผ่าน Apache / PHP Server ปกติ จะปล่อยให้ Form POST ไปยัง ../script/login.php ตามปกติ
         });
     </script>
 </body>

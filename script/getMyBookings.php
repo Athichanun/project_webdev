@@ -1,10 +1,15 @@
 <?php
+session_start();
 ob_start();
 header('Content-Type: application/json; charset=utf-8');
 include "mainConnect.php";
 
-// 1. ตรวจสอบว่าผู้ใช้ล็อกอินหรือไม่
-$cusId = isset($_COOKIE['memberId']) ? (int)$_COOKIE['memberId'] : 0;
+$cusId = 0;
+if (isset($_SESSION['memberId'])) {
+    $cusId = (int)$_SESSION['memberId'];
+} elseif (isset($_COOKIE['memberId'])) {
+    $cusId = (int)$_COOKIE['memberId'];
+}
 
 if (!$cusId) {
     echo json_encode([
@@ -14,11 +19,9 @@ if (!$cusId) {
     exit();
 }
 
-// 2. รับค่าตัวกรองสถานะ (ค่าเริ่มต้นคือ Waiting)
 $status = isset($_GET['status']) ? trim($_GET['status']) : 'Waiting';
 
 try {
-    // 3. ดึงรายการจองของลูกค้ารายนี้ พร้อมข้อมูลห้องพักและวันที่จอง
     $sql = "SELECT 
                 b.booking_id,
                 b.cus_id,
@@ -47,7 +50,6 @@ try {
     
     $params = [$cusId];
 
-    // ถ้าไม่ใช่ 'all' ให้กรองตาม payment_status (เช่น 'Waiting')
     if (!empty($status) && $status !== 'all') {
         $sql .= " AND b.payment_status = ?";
         $params[] = $status;
