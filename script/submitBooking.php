@@ -1,4 +1,5 @@
 <?php
+session_start();
 ob_start();
 header('Content-Type: application/json; charset=utf-8');
 include "mainConnect.php";

@@ -5,10 +5,10 @@ header('Content-Type: application/json; charset=utf-8');
 include "mainConnect.php";
 
 $cusId = 0;
-if (isset($_SESSION['memberId'])) {
-    $cusId = (int)$_SESSION['memberId'];
-} elseif (isset($_COOKIE['memberId'])) {
+if (isset($_COOKIE['memberId']) && (int)$_COOKIE['memberId'] > 0) {
     $cusId = (int)$_COOKIE['memberId'];
+} elseif (isset($_SESSION['memberId']) && (int)$_SESSION['memberId'] > 0) {
+    $cusId = (int)$_SESSION['memberId'];
 }
 
 if (!$cusId) {
@@ -23,15 +23,7 @@ $status = isset($_GET['status']) ? trim($_GET['status']) : 'Waiting';
 
 try {
     $sql = "SELECT 
-                b.booking_id,
-                b.cus_id,
-                b.room_id,
-                b.check_in,
-                b.check_out,
-                b.total_price,
-                b.payment_status,
-                b.is_promo,
-                b.promo_id,
+                b.*,
                 p.title AS promo_title,
                 p.description AS promo_description,
                 p.discount_badge AS promo_badge,
@@ -42,10 +34,7 @@ try {
                 r.room_type,
                 r.price AS room_price,
                 r.path_photo,
-                r.image_url,
-                r.bed_type,
                 r.max_guests,
-                r.room_size,
                 h.Date_booking
             FROM Booking b
             LEFT JOIN Customer c ON b.cus_id = c.cus_id
@@ -81,4 +70,3 @@ try {
     ]);
 }
 ?>
-
