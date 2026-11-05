@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(["success" => false, "message" => "รูปแบบการส่งข้อมูลไม่ถูกต้อง"]);
     exit();
 }
+
 $roomId        = isset($_POST['room_id']) ? trim($_POST['room_id']) : '';
 $cusName       = isset($_POST['cus_name']) ? trim($_POST['cus_name']) : '';
 $phone         = isset($_POST['phone']) ? trim($_POST['phone']) : '';
@@ -14,17 +15,18 @@ $email         = isset($_POST['email']) ? trim($_POST['email']) : '';
 $checkIn       = isset($_POST['check_in']) ? trim($_POST['check_in']) : '';
 $checkOut      = isset($_POST['check_out']) ? trim($_POST['check_out']) : '';
 $paymentMethod = isset($_POST['payment_method']) ? trim($_POST['payment_method']) : 'Waiting';
-
+$promoId       = !empty($_POST['promo_id']) ? (int)$_POST['promo_id'] : null;
 
 $paymentStatus = ($paymentMethod === 'Waiting') ? 'Waiting' : 'Paid';
 
 if (empty($roomId) || empty($cusName) || empty($phone) || empty($checkIn) || empty($checkOut)) {
-    echo json_encode(["success" => false, "message" => "กรุณากรอกข้อมูลให้ครบถ้วน"]);
+    echo json_encode(["success" => false, "message" => "กรุณาเลือกห้องพักและกรอกข้อมูลให้ครบถ้วน"]);
     exit();
 }
 
 try {
     $pdo->beginTransaction();
+
     $stmtRoom = $pdo->prepare("SELECT price FROM rooms WHERE room_id = ?");
     $stmtRoom->execute([$roomId]);
     $room = $stmtRoom->fetch(PDO::FETCH_ASSOC);
@@ -58,12 +60,8 @@ try {
             $stmtCusData->execute([$cusId]);
             $cusInfo = $stmtCusData->fetch(PDO::FETCH_ASSOC);
             if ($cusInfo) {
-                if (isset($cusInfo['is_member'])) {
-                    $isMember = ($cusInfo['is_member'] == 1);
-                }
-                if (isset($cusInfo['old_user'])) {
-                    $oldUserCount = (int)$cusInfo['old_user'];
-                }
+                if (isset($cusInfo['is_member'])) $isMember = ($cusInfo['is_member'] == 1);
+                if (isset($cusInfo['old_user'])) $oldUserCount = (int)$cusInfo['old_user'];
             }
         } catch (PDOException $e) {
             $oldUserCount = isset($_COOKIE['old_user']) ? (int)$_COOKIE['old_user'] : 0;
@@ -78,12 +76,8 @@ try {
 
         if ($existingCus) {
             $cusId = $existingCus['cus_id'];
-            if (isset($existingCus['is_member'])) {
-                $isMember = ($existingCus['is_member'] == 1);
-            }
-            if (isset($existingCus['old_user'])) {
-                $oldUserCount = (int)$existingCus['old_user'];
-            }
+            if (isset($existingCus['is_member'])) $isMember = ($existingCus['is_member'] == 1);
+            if (isset($existingCus['old_user'])) $oldUserCount = (int)$existingCus['old_user'];
         } else {
             try {
                 $stmtInsertCus = $pdo->prepare("INSERT INTO Customer (cus_name, phone, email, is_member, old_user) VALUES (?, ?, ?, 0, 0)");
@@ -100,25 +94,44 @@ try {
 
     $isOldUser = ($isMember && $oldUserCount > 0);
     $discountPercent = 0;
-    if ($isMember) {
-        $discountPercent = $isOldUser ? 20 : 15;
+    $isPromo = 0;
+
+
+    $promoData = null;
+    if ($promoId) {
+        $stmtPromo = $pdo->prepare("SELECT promo_id, title, sale_price FROM promotions WHERE promo_id = ? LIMIT 1");
+        $stmtPromo->execute([$promoId]);
+        $promoData = $stmtPromo->fetch(PDO::FETCH_ASSOC);
     }
 
-    $unitPrice = (float)$room['price'];
-    if ($discountPercent > 0) {
-        $unitPrice = round($unitPrice * (1 - $discountPercent / 100), 2);
+    if ($promoData) {
+  
+        $isPromo = 1;
+        $unitPrice = (float)$promoData['sale_price'];
+    } else {
+
+        $promoId = null;
+        if ($isMember) {
+            $discountPercent = $isOldUser ? 20 : 15;
+        }
+        $unitPrice = (float)$room['price'];
+        if ($discountPercent > 0) {
+            $unitPrice = round($unitPrice * (1 - $discountPercent / 100), 2);
+        }
     }
+
     $totalPrice = $nights * $unitPrice;
 
     try {
+        $sqlBooking = "INSERT INTO Booking (cus_id, cus_name, phone, email, room_id, check_in, check_out, total_price, payment_status, is_promo, promo_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmtBooking = $pdo->prepare($sqlBooking);
+        $stmtBooking->execute([$cusId, $cusName, $phone, $email, $roomId, $checkIn, $checkOut, $totalPrice, $paymentStatus, $isPromo, $promoId]);
+        $bookingId = $pdo->lastInsertId();
+    } catch (PDOException $e) {
+        // Fallback กรณีตารางยังไม่ได้เพิ่มคอลัมน์
         $sqlBooking = "INSERT INTO Booking (cus_id, cus_name, phone, email, room_id, check_in, check_out, total_price, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmtBooking = $pdo->prepare($sqlBooking);
         $stmtBooking->execute([$cusId, $cusName, $phone, $email, $roomId, $checkIn, $checkOut, $totalPrice, $paymentStatus]);
-        $bookingId = $pdo->lastInsertId();
-    } catch (PDOException $e) {
-        $sqlBooking = "INSERT INTO Booking (cus_id, room_id, check_in, check_out, total_price, payment_status) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmtBooking = $pdo->prepare($sqlBooking);
-        $stmtBooking->execute([$cusId, $roomId, $checkIn, $checkOut, $totalPrice, $paymentStatus]);
         $bookingId = $pdo->lastInsertId();
     }
 
@@ -129,9 +142,7 @@ try {
     try {
         $stmtIncOld = $pdo->prepare("UPDATE Customer SET old_user = COALESCE(old_user, 0) + 1 WHERE cus_id = ?");
         $stmtIncOld->execute([$cusId]);
-    } catch (PDOException $e) {
-        error_log("Failed to increment old_user: " . $e->getMessage());
-    }
+    } catch (PDOException $e) {}
 
     if ($loggedInCusId && $loggedInCusId == $cusId) {
         $newOldUserCount = $oldUserCount + 1;
@@ -146,6 +157,8 @@ try {
         "total_price" => $totalPrice,
         "payment_status" => $paymentStatus,
         "discount_percent" => $discountPercent,
+        "is_promo" => $isPromo,
+        "promo_title" => $promoData ? $promoData['title'] : null,
         "is_member" => $isMember,
         "is_old_user" => $isOldUser,
         "old_user" => $oldUserCount + 1

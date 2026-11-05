@@ -226,7 +226,7 @@
                 });
         }
 
-        // แสดงผลรายการจอง
+        
         function renderBookings(bookings, status) {
             const container = document.getElementById('bookings-list');
 
@@ -266,6 +266,17 @@
                 const roomImg = item.path_photo || item.image_url || '';
                 const totalPrice = Number(item.total_price).toLocaleString();
 
+                const promoDetailHtml = (item.is_promo == 1 && item.promo_title) ? `
+                    <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px;">
+                        <div style="font-size: 13px; font-weight: bold; color: #1d4ed8; margin-bottom: 3px;">
+                            🎁 โปรโมชั่นที่ใช้: ${item.promo_title} ${item.promo_badge ? `<span style="background:#dc2626; color:#fff; padding:1px 6px; border-radius:10px; font-size:11px; margin-left:4px;">${item.promo_badge}</span>` : ''}
+                        </div>
+                        <div style="font-size: 12px; color: #475569; line-height: 1.4;">
+                            ${item.promo_description || ''}
+                        </div>
+                    </div>
+                ` : '';
+
                 html += `
                 <div class="booking-item-card">
                     <div class="booking-item-img">
@@ -299,6 +310,7 @@
                                     <strong>👥 ${item.max_guests || 2} ท่าน | ${item.bed_type || '-'}</strong>
                                 </div>
                             </div>
+                            ${promoDetailHtml}
                         </div>
 
                         <div class="booking-footer">

@@ -243,7 +243,7 @@
             });
         }
 
-        // ฟังก์ชันดึงข้อมูลโปรโมชั่นจาก Database มาแสดงผล
+        
         function fetchPromotions() {
             fetch('../script/promotions.php')
                 .then(res => res.json())
@@ -259,6 +259,7 @@
             const featured = promos.find(p => p.is_featured == 1);
             const featuredContainer = document.querySelector('.featured-container');
             if (featured && featuredContainer) {
+                const safeTitle = (featured.title || '').replace(/'/g, "\\'");
                 featuredContainer.innerHTML = `
                     <div class="featured-img">
                         <img src="${featured.path_photo || ''}" alt="${featured.title}">
@@ -277,17 +278,17 @@
                                 <span>เริ่มต้นเพียง ${Number(featured.sale_price).toLocaleString()} ฿ ${featured.price_unit || ''}</span>
                             </div>
                         </div>
-                        <button class="offer-btn" onclick="window.location.href='rooms.html'">จองเลย</button>
+                        <button class="offer-btn" onclick="goToPromoBooking(${featured.promo_id}, '${safeTitle}', ${featured.sale_price}, ${featured.original_price || 0})">จองโปรโมชั่นนี้เลย</button>
                     </div>
                 `;
             }
-
 
             const grid = document.querySelector('.offers-grid');
             const normalPromos = promos.filter(p => p.is_featured == 0);
             if (grid && normalPromos.length > 0) {
                 let html = '';
                 normalPromos.forEach(item => {
+                    const safeTitle = (item.title || '').replace(/'/g, "\\'");
                     const origPriceHtml = item.original_price
                         ? `<span class="original-price">${Number(item.original_price).toLocaleString()} ฿</span>`
                         : '';
@@ -310,12 +311,24 @@
                                 <span class="sale-price">${Number(item.sale_price).toLocaleString()} ฿</span>
                                 ${unitHtml}
                             </div>
-                            <button class="offer-card-btn" onclick="window.location.href='rooms.html'">ดูรายละเอียด</button>
+                            <button class="offer-card-btn" onclick="goToPromoBooking(${item.promo_id}, '${safeTitle}', ${item.sale_price}, ${item.original_price || 0})">จองด้วยโปรโมชั่นนี้</button>
                         </div>
                     </div>`;
                 });
                 grid.innerHTML = html;
             }
+        }
+
+        function goToPromoBooking(promoId, title, salePrice, origPrice) {
+            const params = new URLSearchParams({
+                promo_id: promoId,
+                promo_title: title,
+                promo_price: salePrice
+            });
+            if (origPrice) {
+                params.append('orig_price', origPrice);
+            }
+            window.location.href = `booking.html?${params.toString()}`;
         }
 
         document.addEventListener('DOMContentLoaded', function () {

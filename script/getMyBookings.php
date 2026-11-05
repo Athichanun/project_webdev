@@ -30,6 +30,11 @@ try {
                 b.check_out,
                 b.total_price,
                 b.payment_status,
+                b.is_promo,
+                b.promo_id,
+                p.title AS promo_title,
+                p.description AS promo_description,
+                p.discount_badge AS promo_badge,
                 COALESCE(b.cus_name, c.cus_name) AS cus_name,
                 COALESCE(b.phone, c.phone) AS phone,
                 COALESCE(b.email, c.email) AS email,
@@ -46,6 +51,7 @@ try {
             LEFT JOIN Customer c ON b.cus_id = c.cus_id
             LEFT JOIN rooms r ON b.room_id = r.room_id
             LEFT JOIN History h ON b.booking_id = h.booking_id
+            LEFT JOIN promotions p ON b.promo_id = p.promo_id
             WHERE b.cus_id = ?";
     
     $params = [$cusId];

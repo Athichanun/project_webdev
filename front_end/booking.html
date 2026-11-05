@@ -37,6 +37,14 @@
             <form id="booking-form">
                 <input type="hidden" id="room-id" name="room_id">
                 <input type="hidden" id="is-member" name="is_member" value="0">
+                <input type="hidden" id="promo-id" name="promo_id" value="">
+
+                <div class="form-group" id="room-select-group" style="display: none;">
+                    <label for="room-select" class="required">เลือกห้องพักสำหรับโปรโมชั่นนี้</label>
+                    <select id="room-select">
+                        <option value="">-- กำลังโหลดรายการห้องพัก... --</option>
+                    </select>
+                </div>
 
                 <div class="form-group">
                     <label for="cus-name" class="required">ชื่อ - นามสกุล ผู้เข้าพัก</label>
@@ -274,9 +282,14 @@
         }
 
         // ดึงข้อมูลห้องพัก
+        // ดึงข้อมูลห้องพักและโปรโมชั่นจาก URL
         const urlParams = new URLSearchParams(window.location.search);
-        const roomId = urlParams.get('room_id');
-        const roomName = urlParams.get('room_name') || 'ไม่ระบุห้องพัก';
+        let roomId = urlParams.get('room_id') || '';
+        let roomName = urlParams.get('room_name') || 'กรุณาเลือกห้องพัก';
+        const promoId = urlParams.get('promo_id') || '';
+        const promoTitle = urlParams.get('promo_title') || '';
+        const promoPrice = Number(urlParams.get('promo_price')) || 0;
+
         const isMember = !!(getAuthData('memberId') || getAuthData('username'));
         const oldUserParam = urlParams.get('old_user');
         const oldUserCount = oldUserParam !== null
@@ -289,7 +302,27 @@
         let origPrice = Number(urlParams.get('orig_price')) || passedPrice;
         let pricePerNight = passedPrice;
 
-        if (isMember) {
+        if (promoId && promoPrice > 0) {
+            document.getElementById('promo-id').value = promoId;
+            pricePerNight = promoPrice;
+
+            const bannerEl = document.getElementById('member-privilege-banner');
+            if (bannerEl) {
+                bannerEl.style.display = 'block';
+                bannerEl.style.background = '#eff6ff';
+                bannerEl.style.borderColor = '#bfdbfe';
+                bannerEl.style.color = '#1d4ed8';
+                bannerEl.innerHTML = `🏷️ <strong>โปรโมชั่นที่เลือก:</strong> ${promoTitle} (ราคาพิเศษ ${promoPrice.toLocaleString()} ฿)`;
+            }
+
+            if (origPrice > promoPrice) {
+                document.getElementById('orig-price-row').style.display = 'flex';
+                document.getElementById('display-orig-price').textContent = origPrice.toLocaleString() + ' ฿';
+            }
+            document.getElementById('display-price').style.color = '#dc2626';
+            document.getElementById('display-price').style.fontWeight = 'bold';
+        } 
+        else if (isMember) {
             const isMemberInput = document.getElementById('is-member');
             if (isMemberInput) isMemberInput.value = '1';
 
@@ -330,6 +363,45 @@
         document.getElementById('display-room-name').textContent = roomName;
         document.getElementById('display-price').textContent = pricePerNight.toLocaleString() + ' ฿';
 
+        const roomSelectGroup = document.getElementById('room-select-group');
+        const roomSelect = document.getElementById('room-select');
+        if (roomSelectGroup && roomSelect) {
+            roomSelectGroup.style.display = 'block';
+            fetch('../script/rooms.php')
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success && res.data) {
+                        let opts = '<option value="">-- กรุณาเลือกห้องพัก --</option>';
+                        res.data.forEach(rm => {
+                            const selected = (String(rm.room_id) === String(roomId)) ? 'selected' : '';
+                            opts += `<option value="${rm.room_id}" data-name="${rm.room_name}" data-price="${rm.original_price || rm.price}" ${selected}>${rm.room_name} (รองรับ ${rm.max_guests} ท่าน)</option>`;
+                        });
+                        roomSelect.innerHTML = opts;
+
+                        
+                        if (!roomId && res.data.length > 0) {
+                            roomSelect.selectedIndex = 1;
+                            roomSelect.dispatchEvent(new Event('change'));
+                        }
+                    }
+                });
+
+            roomSelect.addEventListener('change', function () {
+                const opt = this.options[this.selectedIndex];
+                roomId = this.value;
+                document.getElementById('room-id').value = roomId;
+                if (opt && roomId) {
+                    roomName = opt.getAttribute('data-name');
+                    document.getElementById('display-room-name').textContent = roomName;
+                    if (!promoId) {
+                        const rawRmPrice = Number(opt.getAttribute('data-price')) || 0;
+                        pricePerNight = isMember ? Math.round(rawRmPrice * (100 - discountPercent) / 100) : rawRmPrice;
+                        document.getElementById('display-price').textContent = pricePerNight.toLocaleString() + ' ฿';
+                    }
+                    calculateTotal();
+                }
+            });
+        }
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
