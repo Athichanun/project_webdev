@@ -4,7 +4,7 @@ ob_start();
 header('Content-Type: application/json; charset=utf-8');
 include "mainConnect.php";
 
-// ตรวจสอบสิทธิ์ Admin จาก Cookie หรือ Session
+
 $isAdmin = (isset($_COOKIE['isAdmin']) && $_COOKIE['isAdmin'] === '1') || (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1);
 
 if (!$isAdmin) {
@@ -16,7 +16,7 @@ if (!$isAdmin) {
 }
 
 try {
-    // 1. ดึงรายการจองทั้งหมดพร้อมเชื่อมตาราง rooms, Customer, promotions, History
+
     $sql = "SELECT 
                 b.booking_id,
                 b.cus_id,
@@ -44,11 +44,11 @@ try {
     $stmt = $pdo->query($sql);
     $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 2. ดึงรายชื่อโปรโมชั่นทั้งหมดเพื่อให้กราฟแสดงครบทุกโปรโมชั่น
+
     $stmtPromos = $pdo->query("SELECT promo_id, title FROM promotions ORDER BY promo_id ASC");
     $promotions = $stmtPromos->fetchAll(PDO::FETCH_ASSOC);
 
-    // 3. ดึงรายการห้องพักทั้งหมดเพื่อใช้ในตัวกรอง
+  
     $stmtRooms = $pdo->query("SELECT room_id, room_name, room_type FROM rooms ORDER BY room_id ASC");
     $rooms = $stmtRooms->fetchAll(PDO::FETCH_ASSOC);
 

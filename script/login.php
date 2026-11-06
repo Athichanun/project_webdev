@@ -10,9 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $user = trim($_POST['username'] ?? '');
 $pass = trim($_POST['password'] ?? '');
 
-// ==========================================
-// 1. เช็คจากตาราง Admin ก่อน
-// ==========================================
+
 $sqlAdmin = "SELECT * FROM Admin WHERE admin_name = ? LIMIT 1";
 $stmtAdmin = $pdo->prepare($sqlAdmin);
 $stmtAdmin->execute([$user]);
@@ -37,7 +35,7 @@ if ($isAdminValid) {
     setcookie("cus_name", "Admin (" . (string)$adminResult['admin_name'] . ")", time() + 86400, "/");
     setcookie("isAdmin", "1", time() + 86400, "/");
 
-    // ล้างคุกกี้ฝั่งลูกค้าออกเพื่อไม่ให้ตีกัน
+
     setcookie("memberId", "", time() - 3600, "/");
     setcookie("old_user", "0", time() - 3600, "/");
 
@@ -45,9 +43,7 @@ if ($isAdminValid) {
     exit();
 }
 
-// ==========================================
-// 2. เช็คตาราง Customer ตามปกติ (โค้ดเดิม 100%)
-// ==========================================
+
 $sql = "SELECT * FROM Customer WHERE username = ? LIMIT 1";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$user]);
@@ -84,7 +80,6 @@ if ($isValid) {
     }
     setcookie("old_user", (string)((int)($result['old_user'] ?? 0)), time() + 86400, "/");
 
-    // ล้างคุกกี้ Admin ทิ้ง (ถ้ามีค้างอยู่)
     setcookie("isAdmin", "", time() - 3600, "/");
     setcookie("adminId", "", time() - 3600, "/");
 
