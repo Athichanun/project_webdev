@@ -7,7 +7,7 @@
 .bookings-hero {
     background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     color: white;
-    padding: 28px 16px;
+    padding: 28px 16px; 
     text-align: center;
 }
 
@@ -25,9 +25,12 @@
 .bookings-container {
     width: 100%;
     max-width: 1050px;
-    margin: -16px auto 0;
+    /* เปลี่ยนจาก -16px เป็น -40px เพื่อดึงกล่องขึ้นไปทับขอบสีน้ำเงิน */
+    margin: -40px auto 0; 
     padding: 0 14px;
     box-sizing: border-box;
+    position: relative; /* สั่งให้กล่องลอยอยู่บนสุด */
+    z-index: 10;
 }
 
 /* ==================== User Info Card ==================== */
@@ -42,6 +45,9 @@
     gap: 12px;
     margin-bottom: 20px;
     border: 1px solid #f1f5f9;
+    margin-top: -40px; 
+    position: relative;
+    z-index: 10;
 }
 
 .user-card-left {
@@ -320,7 +326,7 @@
 
 @media (min-width: 768px) {
     .bookings-hero {
-        padding: 45px 20px;
+        padding: 45px 20px 80px; 
     }
 
     .bookings-hero h1 {
@@ -332,7 +338,7 @@
     }
 
     .bookings-container {
-        margin: -25px auto 0;
+        margin: -60px auto 0; 
         padding: 0 20px;
     }
 
