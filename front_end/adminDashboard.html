@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Azure Resort</title>
+    <link rel="stylesheet" href="stlyer/stlye.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="stlyer/adminDashboard.css">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">
+            <a href="main.html">
+                <img src="photo/logo.png" alt="Azure Resort Logo"
+                    style="height: 40px; width: auto; object-fit: contain;">
+            </a>
+        </div>
+        <div class="page_bar">
+            <ul class="nav-links">
+                <li><a href="main.html">Home</a></li>
+                <li><a href="rooms.html">Rooms</a></li>
+                <li><a href="offers.html">Offers</a></li>
+                <li><a href="location.html">Location</a></li>
+            </ul>
+            <div class="auth-action" id="nav-auth-section">
+                <button class="btn auth-btn" onclick="window.location.href='logIn.html'">LOGIN</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-page">
+        <section class="dashboard-hero">
+            <h1>ระบบรายงานและสถิติสำหรับผู้ดูแลระบบ</h1>
+            <p>ADMIN ANALYTICS & BOOKING DASHBOARD</p>
+        </section>
+
+        <div class="dashboard-container">
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <span>รายได้รวม (Total Revenue)</span>
+                        <h2 id="kpi-revenue">0 ฿</h2>
+                        <small id="kpi-revenue-sub">คำนวณจากรายการที่ไม่ถูกยกเลิก</small>
+                    </div>
+                    <div class="kpi-icon" style="background: #dcfce7; color: #16a34a;">💰</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <span>จำนวนการจองทั้งหมด (Total Bookings)</span>
+                        <h2 id="kpi-bookings">0 รายการ</h2>
+                        <small id="kpi-bookings-sub">ตามเงื่อนไขตัวกรองที่เลือก</small>
+                    </div>
+                    <div class="kpi-icon" style="background: #e0f2fe; color: #0284c7;">📅</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <span>อัตราการใช้โปรโมชั่น (Promotion Usage)</span>
+                        <h2 id="kpi-promo-rate">0%</h2>
+                        <small id="kpi-promo-sub">ใช้โปรโมชั่น 0 จาก 0 รายการ</small>
+                    </div>
+                    <div class="kpi-icon" style="background: #fef3c7; color: #d97706;">🎁</div>
+                </div>
+            </div>
+
+    
+            <div class="filter-panel">
+                <div class="filter-header">
+                    <h3>🔍 ตัวกรองข้อมูลรายงาน (Filter & Search)</h3>
+                    <span id="filter-active-count" style="font-size: 13px; color: #0284c7; font-weight: bold;"></span>
+                </div>
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label for="filter-month">เดือนที่เข้าพัก (Check-in)</label>
+                        <select id="filter-month">
+                            <option value="all">ทุกเดือน (All Time)</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filter-room-type">ประเภทห้องพัก</label>
+                        <select id="filter-room-type">
+                            <option value="all">ทุกประเภท (All Types)</option>
+                            <option value="superior">Superior</option>
+                            <option value="deluxe">Deluxe</option>
+                            <option value="family">Family</option>
+                            <option value="suite">Suite</option>
+                            <option value="standard">Standard</option>
+                            <option value="villa">Villa</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filter-status">สถานะการชำระเงิน</label>
+                        <select id="filter-status">
+                            <option value="all">ทุกสถานะ (ไม่รวมยกเลิก)</option>
+                            <option value="Paid">ชำระเงินแล้ว (Paid)</option>
+                            <option value="Waiting">รอชำระเงิน (Waiting)</option>
+                            <option value="Cancelled">ยกเลิกแล้ว (Cancelled)</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="search-customer">ค้นหาชื่อลูกค้า / ห้องพัก</label>
+                        <input type="text" id="search-customer" placeholder="พิมพ์ชื่อลูกค้า หรือ ชื่อห้อง...">
+                    </div>
+
+                    <div class="filter-group">
+                        <button type="button" class="btn-reset" id="btn-reset-filter">🔄 รีเซ็ตตัวกรอง</button>
+                    </div>
+                </div>
+            </div>
+
+        
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>📊 สรุปยอดการจองแยกตามโปรโมชั่นที่เลือก</h3>
+                    <p>เปรียบเทียบจำนวนการจองห้องพักในแต่ละโปรโมชั่นและสิทธิพิเศษ</p>
+                    <div class="chart-wrapper">
+                        <canvas id="promoBarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>🍩 สัดส่วนประเภทห้องพักยอดฮิต</h3>
+                    <p>กราฟวงกลมแสดงสัดส่วนการจองแยกตามประเภทห้องพัก (Room Type)</p>
+                    <div class="chart-wrapper">
+                        <canvas id="roomTypePieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+       
+            <div class="table-card">
+                <div class="table-header">
+                    <div>
+                        <h3 style="margin: 0; font-size: 16px; color: #1e293b;">📋 ตารางสรุปข้อมูลการจองห้องพักรายวัน</h3>
+                        <p style="margin: 2px 0 0; font-size: 12px; color: #64748b;">แสดงรายละเอียดว่าวันไหนมีการจองห้องใดประเภทใดบ้าง</p>
+                    </div>
+                </div>
+
+              
+                <div class="room-summary-strip" id="room-breakdown-strip"></div>
+
+                <div class="table-responsive">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>รหัสจอง</th>
+                                <th>วันที่เช็คอิน - เช็คเอาท์</th>
+                                <th>ห้องพักที่จอง</th>
+                                <th>ประเภท</th>
+                                <th>ชื่อผู้เข้าพัก</th>
+                                <th>โปรโมชั่นที่ใช้</th>
+                                <th>สถานะชำระเงิน</th>
+                                <th style="text-align: right;">ยอดสุทธิ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 30px;">กำลังโหลดข้อมูลรายงาน...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-bottom" style="margin-top: 0; border-top: none;">
+            <p>© 2026 Azure Resort - Admin Management System</p>
+        </div>
+    </footer>
+
+    <script>
+        function getAuthData(key) {
+            const nameEQ = key + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i].trim();
+                if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length));
+            }
+            try { return localStorage.getItem(key); } catch (e) { return null; }
+        }
+
+        function clearAuthData() {
+            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user', 'old_user', 'isAdmin', 'adminId'];
+            keys.forEach(k => {
+                document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                try { localStorage.removeItem(k); } catch (e) { }
+            });
+        }
+
+        function updateNavAuth() {
+            const memberId = getAuthData('memberId');
+            const username = getAuthData('username');
+            const isAdmin = getAuthData('isAdmin') === '1';
+            const authSection = document.getElementById('nav-auth-section');
+
+            if (authSection && (memberId || username || isAdmin)) {
+                const displayName = username || 'Admin';
+                authSection.innerHTML = `
+                    <div class="user-profile-menu">
+                        <a href="adminDashboard.html" class="profile-avatar-link" title="Dashboard (${displayName})">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" 
+                                 alt="User Profile" 
+                                 class="user-avatar" 
+                                 onerror="this.onerror=null; this.src='user-avatar.svg';">
+                        </a>
+                        <div id="profile-dropdown" class="profile-dropdown">
+                            <div class="dropdown-header">
+                                <strong>${displayName}</strong>
+                                <div style="font-size:11px; color:#0284c7; font-weight:bold;">🛡️ ผู้ดูแลระบบ (Admin)</div>
+                            </div>
+                            <a href="adminDashboard.html" class="dropdown-item" style="color: #0284c7; font-weight: bold;">📊 Dashboard</a>
+                            <a href="myBookings.html" class="dropdown-item" style="color: #14a2e4; font-weight: bold;">📋 รายการจองของฉัน</a>
+                            <a href="javascript:void(0)" class="dropdown-item logout-link" id="logout-btn">ออกจากระบบ (Logout)</a>
+                        </div>
+                    </div>
+                `;
+
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        clearAuthData();
+                        fetch('../script/logout.php').catch(() => { }).finally(() => {
+                            window.location.href = 'main.html';
+                        });
+                    });
+                }
+            }
+        }
+
+        let allBookings = [];
+        let allPromotions = [];
+        let promoChartInstance = null;
+        let roomPieChartInstance = null;
+
+        function populateMonthFilter(bookings) {
+            const monthSelect = document.getElementById('filter-month');
+            const monthsSet = new Set();
+            bookings.forEach(b => {
+                if (b.check_in && b.check_in.length >= 7) {
+                    monthsSet.add(b.check_in.substring(0, 7)); // YYYY-MM
+                }
+            });
+
+            const sortedMonths = Array.from(monthsSet).sort().reverse();
+            const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+
+            sortedMonths.forEach(ym => {
+                const [y, m] = ym.split('-');
+                const label = `${thaiMonths[parseInt(m, 10) - 1]} ${parseInt(y, 10) + 543} (${ym})`;
+                const opt = document.createElement('option');
+                opt.value = ym;
+                opt.textContent = label;
+                monthSelect.appendChild(opt);
+            });
+        }
+
+        function applyDashboardFilters() {
+            const monthVal = document.getElementById('filter-month').value;
+            const roomTypeVal = document.getElementById('filter-room-type').value;
+            const statusVal = document.getElementById('filter-status').value;
+            const searchVal = document.getElementById('search-customer').value.trim().toLowerCase();
+
+            const filtered = allBookings.filter(item => {
+                // 1. กรองตามเดือน
+                if (monthVal !== 'all') {
+                    if (!item.check_in || !item.check_in.startsWith(monthVal)) return false;
+                }
+                // 2. กรองตามประเภทห้องพัก
+                if (roomTypeVal !== 'all') {
+                    if ((item.room_type || '').toLowerCase() !== roomTypeVal.toLowerCase()) return false;
+                }
+                // 3. กรองตามสถานะชำระเงิน
+                if (statusVal === 'all') {
+                
+                    if (item.payment_status === 'Cancelled') return false;
+                } else if (statusVal === 'Paid') {
+                    if (item.payment_status !== 'Paid' && item.payment_status !== 'Paid_Card') return false;
+                } else {
+                    if (item.payment_status !== statusVal) return false;
+                }
+                // 4. ค้นหาชื่อลูกค้า หรือ ชื่อห้องพัก
+                if (searchVal) {
+                    const matchName = (item.cus_name || '').toLowerCase().includes(searchVal);
+                    const matchRoom = (item.room_name || '').toLowerCase().includes(searchVal);
+                    const matchId = String(item.booking_id).includes(searchVal);
+                    if (!matchName && !matchRoom && !matchId) return false;
+                }
+                return true;
+            });
+
+            updateKPIs(filtered);
+            updateCharts(filtered);
+            updateRoomBreakdown(filtered);
+            renderTable(filtered);
+        }
+
+        function updateKPIs(data) {
+            let totalRev = 0;
+            let promoCount = 0;
+
+            data.forEach(b => {
+                if (b.payment_status !== 'Cancelled') {
+                    totalRev += Number(b.total_price) || 0;
+                }
+                if (Number(b.is_promo) === 1 || Number(b.promo_id) > 0) {
+                    promoCount++;
+                }
+            });
+
+            const totalCount = data.length;
+            const promoRate = totalCount > 0 ? ((promoCount / totalCount) * 100).toFixed(1) : '0.0';
+
+            document.getElementById('kpi-revenue').textContent = totalRev.toLocaleString() + ' ฿';
+            document.getElementById('kpi-bookings').textContent = totalCount.toLocaleString() + ' รายการ';
+            document.getElementById('kpi-promo-rate').textContent = promoRate + '%';
+            document.getElementById('kpi-promo-sub').textContent = `ใช้โปรโมชั่น ${promoCount} จาก ${totalCount} รายการ`;
+            document.getElementById('filter-active-count').textContent = `พบข้อมูล ${totalCount} รายการ`;
+        }
+
+        function updateCharts(data) {
+            // 1. กราฟแท่ง: สรุปการจองตามโปรโมชั่น
+            const promoCounts = {};
+            allPromotions.forEach(p => {
+                promoCounts[p.title] = 0;
+            });
+            promoCounts['จองปกติ / ส่วนลดสมาชิก'] = 0;
+
+            data.forEach(b => {
+                if (Number(b.is_promo) === 1 && b.promo_title && b.promo_title !== 'ราคาปกติ / ส่วนลดสมาชิก') {
+                    promoCounts[b.promo_title] = (promoCounts[b.promo_title] || 0) + 1;
+                } else {
+                    promoCounts['จองปกติ / ส่วนลดสมาชิก']++;
+                }
+            });
+
+            const barLabels = Object.keys(promoCounts);
+            const barValues = Object.values(promoCounts);
+
+            const barCtx = document.getElementById('promoBarChart').getContext('2d');
+            if (promoChartInstance) promoChartInstance.destroy();
+            promoChartInstance = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: barLabels,
+                    datasets: [{
+                        label: 'จำนวนการจอง (ครั้ง)',
+                        data: barValues,
+                        backgroundColor: [
+                            '#0284c7', '#0ea5e9', '#38bdf8', '#6366f1', '#8b5cf6', '#10b981', '#94a3b8'
+                        ],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+
+            // 2. กราฟวงกลม: ประเภทห้องยอดฮิต
+            const typeMap = {
+                'standard': 'Standard',
+                'deluxe': 'Deluxe',
+                'suite': 'Suite',
+                'villa': 'Villa'
+            };
+            const typeCounts = { 'Standard': 0, 'Deluxe': 0, 'Suite': 0, 'Villa': 0 };
+
+            data.forEach(b => {
+                const rawType = (b.room_type || '').toLowerCase();
+                const label = typeMap[rawType] || b.room_type || 'อื่นๆ';
+                typeCounts[label] = (typeCounts[label] || 0) + 1;
+            });
+
+            const pieLabels = Object.keys(typeCounts);
+            const pieValues = Object.values(typeCounts);
+
+            const pieCtx = document.getElementById('roomTypePieChart').getContext('2d');
+            if (roomPieChartInstance) roomPieChartInstance.destroy();
+            roomPieChartInstance = new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: pieLabels,
+                    datasets: [{
+                        data: pieValues,
+                        backgroundColor: ['#0284c7', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRoomBreakdown(data) {
+            const strip = document.getElementById('room-breakdown-strip');
+            const roomCounts = {};
+            data.forEach(b => {
+                const rName = b.room_name || 'ไม่ระบุ';
+                if (!roomCounts[rName]) {
+                    roomCounts[rName] = { count: 0, revenue: 0 };
+                }
+                roomCounts[rName].count++;
+                if (b.payment_status !== 'Cancelled') {
+                    roomCounts[rName].revenue += Number(b.total_price) || 0;
+                }
+            });
+
+            const entries = Object.entries(roomCounts).sort((a, b) => b[1].count - a[1].count);
+            if (entries.length === 0) {
+                strip.innerHTML = '';
+                return;
+            }
+
+            strip.innerHTML = entries.map(([name, info]) => `
+                <div class="room-pill">
+                    🏨 ${name}: <strong>${info.count} ครั้ง</strong> (${info.revenue.toLocaleString()} ฿)
+                </div>
+            `).join('');
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('report-table-body');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 30px; color: #94a3b8;">ไม่พบรายการจองที่ตรงกับเงื่อนไขตัวกรอง</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(b => {
+                const isPaid = b.payment_status === 'Paid' || b.payment_status === 'Paid_Card';
+                const isCancelled = b.payment_status === 'Cancelled';
+                let statusHtml = '';
+
+                if (isCancelled) {
+                    statusHtml = `<span class="badge-status badge-cancelled">❌ Cancelled</span>`;
+                } else if (isPaid) {
+                    statusHtml = `<span class="badge-status badge-paid">✅ Paid</span>`;
+                } else {
+                    statusHtml = `<span class="badge-status badge-waiting">⏳ Waiting</span>`;
+                }
+
+                const promoText = (Number(b.is_promo) === 1 && b.promo_title)
+                    ? `<span style="color:#1d4ed8; font-weight:bold;">🎁 ${b.promo_title}</span>`
+                    : `<span style="color:#64748b;">ทั่วไป / สมาชิก</span>`;
+
+                return `
+                    <tr>
+                        <td><strong>#${b.booking_id}</strong></td>
+                        <td>📅 ${b.check_in} <span style="color:#94a3b8;">→</span> ${b.check_out}</td>
+                        <td><strong>${b.room_name}</strong></td>
+                        <td><span class="badge-type">${b.room_type || '-'}</span></td>
+                        <td>
+                            👤 ${b.cus_name}
+                            <br><small style="color:#94a3b8;">📞 ${b.phone}</small>
+                        </td>
+                        <td>${promoText}</td>
+                        <td>${statusHtml}</td>
+                        <td style="text-align: right; font-weight: bold; color: #0f172a;">
+                            ${Number(b.total_price).toLocaleString()} ฿
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function loadDashboardData() {
+            fetch('../script/getAdminReport.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert(data.message || 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+                        window.location.href = 'main.html';
+                        return;
+                    }
+                    allBookings = data.bookings || [];
+                    allPromotions = data.promotions || [];
+                    populateMonthFilter(allBookings);
+                    applyDashboardFilters();
+                })
+                .catch(err => {
+                    console.error('Error loading report:', err);
+                    document.getElementById('report-table-body').innerHTML = `
+                        <tr><td colspan="8" style="text-align: center; color: #ef4444; padding: 30px;">ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์ได้</td></tr>
+                    `;
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (getAuthData('isAdmin') !== '1') {
+                alert('เฉพาะผู้ดูแลระบบ (Admin) เท่านั้นที่สามารถเข้าถึงหน้านี้ได้');
+                window.location.href = 'main.html';
+                return;
+            }
+
+            updateNavAuth();
+            loadDashboardData();
+
+            document.getElementById('filter-month').addEventListener('change', applyDashboardFilters);
+            document.getElementById('filter-room-type').addEventListener('change', applyDashboardFilters);
+            document.getElementById('filter-status').addEventListener('change', applyDashboardFilters);
+            document.getElementById('search-customer').addEventListener('input', applyDashboardFilters);
+
+            document.getElementById('btn-reset-filter').addEventListener('click', function () {
+                document.getElementById('filter-month').value = 'all';
+                document.getElementById('filter-room-type').value = 'all';
+                document.getElementById('filter-status').value = 'all';
+                document.getElementById('search-customer').value = '';
+                applyDashboardFilters();
+            });
+        });
+    </script>
+</body>
+
+</html>

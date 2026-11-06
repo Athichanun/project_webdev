@@ -138,7 +138,7 @@
         }
 
         function clearAuthData() {
-            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user', 'old_user'];
+            const keys = ['memberId', 'username', 'cus_name', 'phone', 'email', 'user', 'old_user', 'isAdmin', 'adminId'];
             keys.forEach(k => {
                 document.cookie = `${k}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
                 try { localStorage.removeItem(k); } catch (e) { }
@@ -149,13 +149,16 @@
         function updateNavAuth() {
             const memberId = getAuthData('memberId');
             const username = getAuthData('username');
+            const isAdmin = getAuthData('isAdmin') === '1';
             const oldUser = parseInt(getAuthData('old_user') || '0', 10);
             const authSection = document.getElementById('nav-auth-section');
             const promoEl = document.getElementById('promotion-text');
 
-            if (authSection && (memberId || username)) {
+            if (authSection && (memberId || username || isAdmin)) {
                 if (promoEl) {
-                    if (oldUser > 0) {
+                    if (isAdmin) {
+                        promoEl.innerHTML = `🛡️ โหมดผู้ดูแลระบบ (Admin Mode) - จัดการข้อมูลและดูรายงานได้ที่เมนู Dashboard`;
+                    } else if (oldUser > 0) {
                         promoEl.innerHTML = `โปรโมชั่น 🎉 สิทธิพิเศษสมาชิกเก่า (เคยจองแล้ว ${oldUser} ครั้ง): ได้รับส่วนลด 20% ทุกห้องพัก`;
                     } else {
                         promoEl.innerHTML = `โปรโมชั่น 🎉 สิทธิพิเศษสมาชิก: ได้รับส่วนลด 15% ทุกห้องพัก (จองครั้งถัดไปลดเพิ่มเป็น 20%)`;
@@ -163,9 +166,19 @@
                 }
 
                 const displayName = username || 'User';
+                const statusSubtext = isAdmin
+                    ? '<div style="font-size:11px; color:#0284c7; font-weight:bold;">🛡️ ผู้ดูแลระบบ (Admin)</div>'
+                    : (oldUser > 0
+                        ? '<div style="font-size:11px; color:#16a34a; font-weight:bold;">★ สมาชิกเก่า (ลด 20%)</div>'
+                        : '<div style="font-size:11px; color:#14a2e4;">สมาชิกทั่วไป (ลด 15%)</div>');
+
+                const adminMenuHtml = isAdmin
+                    ? `<a href="adminDashboard.html" class="dropdown-item" style="color: #0284c7; font-weight: bold;">📊 Dashboard</a>`
+                    : '';
+
                 authSection.innerHTML = `
                     <div class="user-profile-menu">
-                        <a href="myBookings.html" class="profile-avatar-link" title="ดูรายการจองของฉัน (${displayName})">
+                        <a href="${isAdmin ? 'adminDashboard.html' : 'myBookings.html'}" class="profile-avatar-link" title="ดูรายการจองของฉัน (${displayName})">
                             <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" 
                                  alt="User Profile" 
                                  class="user-avatar" 
@@ -174,8 +187,9 @@
                         <div id="profile-dropdown" class="profile-dropdown">
                             <div class="dropdown-header">
                                 <strong>${displayName}</strong>
-                                ${oldUser > 0 ? '<div style="font-size:11px; color:#16a34a; font-weight:bold;">★ สมาชิกเก่า (ลด 20%)</div>' : '<div style="font-size:11px; color:#14a2e4;">สมาชิกทั่วไป (ลด 15%)</div>'}
+                                ${statusSubtext}
                             </div>
+                            ${adminMenuHtml}
                             <a href="myBookings.html" class="dropdown-item" style="color: #14a2e4; font-weight: bold;">📋 รายการจองของฉัน</a>
                             <a href="javascript:void(0)" class="dropdown-item logout-link" id="logout-btn">ออกจากระบบ (Logout)</a>
                         </div>

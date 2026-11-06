@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-
 $_SESSION = array();
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
@@ -12,7 +11,6 @@ if (ini_get("session.use_cookies")) {
 }
 session_destroy();
 
-
 setcookie("memberId", "", time() - 3600, "/");
 setcookie("username", "", time() - 3600, "/");
 setcookie("cus_name", "", time() - 3600, "/");
@@ -20,6 +18,8 @@ setcookie("phone", "", time() - 3600, "/");
 setcookie("email", "", time() - 3600, "/");
 setcookie("old_user", "", time() - 3600, "/");
 setcookie("user", "", time() - 3600, "/");
+setcookie("isAdmin", "", time() - 3600, "/");
+setcookie("adminId", "", time() - 3600, "/");
 
 header("Location: ../front_end/main.html");
 exit();
