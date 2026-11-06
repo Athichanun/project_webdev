@@ -19,9 +19,22 @@ if (!$cusId) {
     exit();
 }
 
-$status = isset($_GET['status']) ? trim($_GET['status']) : 'Waiting';
+$status = isset($_GET['status']) ? trim($_GET['status']) : 'upcoming';
+$today = date('Y-m-d');
 
 try {
+    $countUpcomingStmt = $pdo->prepare("SELECT COUNT(*) FROM Booking WHERE cus_id = ? AND check_in >= ? AND (payment_status IS NULL OR payment_status != 'Cancelled')");
+    $countUpcomingStmt->execute([$cusId, $today]);
+    $countUpcoming = (int)$countUpcomingStmt->fetchColumn();
+
+    $countHistoryStmt = $pdo->prepare("SELECT COUNT(*) FROM Booking WHERE cus_id = ? AND (check_in < ? OR payment_status = 'Cancelled')");
+    $countHistoryStmt->execute([$cusId, $today]);
+    $countHistory = (int)$countHistoryStmt->fetchColumn();
+
+    $countAllStmt = $pdo->prepare("SELECT COUNT(*) FROM Booking WHERE cus_id = ?");
+    $countAllStmt->execute([$cusId]);
+    $countAll = (int)$countAllStmt->fetchColumn();
+
     $sql = "SELECT 
                 b.*,
                 p.title AS promo_title,
@@ -45,12 +58,21 @@ try {
     
     $params = [$cusId];
 
-    if (!empty($status) && $status !== 'all') {
+    if ($status === 'upcoming' || $status === 'Waiting') {
+        $sql .= " AND b.check_in >= ? AND (b.payment_status IS NULL OR b.payment_status != 'Cancelled')";
+        $params[] = $today;
+        $sql .= " ORDER BY b.check_in ASC, b.booking_id DESC";
+    } elseif ($status === 'history' || $status === 'past') {
+        $sql .= " AND (b.check_in < ? OR b.payment_status = 'Cancelled')";
+        $params[] = $today;
+        $sql .= " ORDER BY b.check_in DESC, b.booking_id DESC";
+    } elseif ($status !== 'all') {
         $sql .= " AND b.payment_status = ?";
         $params[] = $status;
+        $sql .= " ORDER BY b.booking_id DESC";
+    } else {
+        $sql .= " ORDER BY b.booking_id DESC";
     }
-
-    $sql .= " ORDER BY b.booking_id DESC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -60,6 +82,13 @@ try {
         "success" => true,
         "count" => count($bookings),
         "status_filter" => $status,
+        "today" => $today,
+        "counts" => [
+            "upcoming" => $countUpcoming,
+            "waiting" => $countUpcoming,
+            "history" => $countHistory,
+            "all" => $countAll
+        ],
         "data" => $bookings
     ]);
 

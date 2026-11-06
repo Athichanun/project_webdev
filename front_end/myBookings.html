@@ -53,12 +53,16 @@
             </div>
 
             <div class="tabs-container">
-                <button class="tab-btn active" id="tab-waiting" onclick="switchTab('Waiting')">
-                    ⏳ กำลังรอเข้าใช้งาน (Waiting)
-                    <span class="tab-count" id="count-waiting">0</span>
+                <button class="tab-btn active" id="tab-upcoming" onclick="switchTab('upcoming')">
+                    ⏳ กำลังรอเข้าพัก (Upcoming)
+                    <span class="tab-count" id="count-upcoming">0</span>
+                </button>
+                <button class="tab-btn" id="tab-history" onclick="switchTab('history')">
+                    📜 ประวัติการจอง (History)
+                    <span class="tab-count" id="count-history">0</span>
                 </button>
                 <button class="tab-btn" id="tab-all" onclick="switchTab('all')">
-                    📋 ประวัติการจองทั้งหมด
+                    📋 รายการจองทั้งหมด (All)
                     <span class="tab-count" id="count-all">0</span>
                 </button>
             </div>
@@ -160,7 +164,7 @@
                             <div class="dropdown-header">
                                 <strong>${displayName}</strong>
                             </div>
-                            <a href="myBookings.html" class="dropdown-item" style="color: #14a2e4; font-weight: bold;">📋 รายการจองของฉัน (Waiting)</a>
+                            <a href="myBookings.html" class="dropdown-item" style="color: #14a2e4; font-weight: bold;">📋 รายการจองของฉัน (My Bookings)</a>
                             <a href="javascript:void(0)" class="dropdown-item logout-link" id="logout-btn">ออกจากระบบ (Logout)</a>
                         </div>
                     </div>
@@ -181,59 +185,60 @@
             }
         }
 
-        let currentTab = 'Waiting';
+        let currentTab = 'upcoming';
+        let currentStatusFilter = 'upcoming';
 
         function switchTab(status) {
             currentTab = status;
-            document.getElementById('tab-waiting').classList.toggle('active', status === 'Waiting');
-            document.getElementById('tab-all').classList.toggle('active', status === 'all');
+            currentStatusFilter = status;
+            const tabUpcoming = document.getElementById('tab-upcoming');
+            const tabHistory = document.getElementById('tab-history');
+            const tabAll = document.getElementById('tab-all');
+
+            if (tabUpcoming) tabUpcoming.classList.toggle('active', status === 'upcoming' || status === 'Waiting');
+            if (tabHistory) tabHistory.classList.toggle('active', status === 'history');
+            if (tabAll) tabAll.classList.toggle('active', status === 'all');
+
             fetchBookings(status);
         }
-
-        let currentStatusFilter = 'Waiting';
 
         function fetchBookings(status) {
             currentStatusFilter = status;
             const container = document.getElementById('bookings-list');
             container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 40px;">กำลังโหลดรายการจอง...</p>';
 
-            fetch(`../script/getMyBookings.php?status=${status}`)
+            fetch(`../script/getMyBookings.php?status=${encodeURIComponent(status)}`)
                 .then(res => res.json())
                 .then(data => {
+                    if (data.counts) {
+                        const countUp = document.getElementById('count-upcoming');
+                        const countHist = document.getElementById('count-history');
+                        const countAll = document.getElementById('count-all');
+                        if (countUp) countUp.textContent = data.counts.upcoming ?? 0;
+                        if (countHist) countHist.textContent = data.counts.history ?? 0;
+                        if (countAll) countAll.textContent = data.counts.all ?? 0;
+                    }
                     if (data.success && data.data && data.data.length > 0) {
-                        renderBookings(data.data, status);
-                        if (status === 'Waiting') {
-                            document.getElementById('count-waiting').textContent = data.count || data.data.length;
-                        } else {
-                            document.getElementById('count-all').textContent = data.count || data.data.length;
-                        }
+                        renderBookings(data.data, status, data.today);
                     } else {
-                        renderBookings([], status);
-                        if (status === 'Waiting') {
-                            document.getElementById('count-waiting').textContent = '0';
-                        } else {
-                            document.getElementById('count-all').textContent = '0';
-                        }
+                        renderBookings([], status, data.today);
                     }
                 })
                 .catch(() => {
                     renderBookings([], status);
-                    if (status === 'Waiting') {
-                        document.getElementById('count-waiting').textContent = '0';
-                    } else {
-                        document.getElementById('count-all').textContent = '0';
-                    }
                 });
         }
 
-        
-        function renderBookings(bookings, status) {
+        function renderBookings(bookings, status, serverToday) {
             const container = document.getElementById('bookings-list');
 
             if (!bookings || bookings.length === 0) {
-                const message = (status === 'Waiting')
-                    ? 'ขณะนี้คุณไม่มีรายการจองห้องพักที่อยู่ในระหว่างรอเข้าใช้งาน (Waiting)'
-                    : 'คุณยังไม่มีประวัติการจองห้องพัก';
+                let message = 'คุณยังไม่มีประวัติการจองห้องพัก';
+                if (status === 'upcoming' || status === 'Waiting') {
+                    message = 'ขณะนี้คุณไม่มีรายการจองห้องพักที่กำลังรอเข้าพัก (ยังไม่ถึงวันเข้าพัก)';
+                } else if (status === 'history') {
+                    message = 'คุณยังไม่มีประวัติการจองห้องพักที่ผ่านมา';
+                }
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="icon">🏨</div>
@@ -245,12 +250,30 @@
                 return;
             }
 
+            const todayStr = serverToday || new Date().toISOString().split('T')[0];
             let html = '';
+
             bookings.forEach(item => {
-                const isWaiting = item.payment_status === 'Waiting';
-                const statusBadge = isWaiting
-                    ? `<span class="status-badge status-waiting">⏳ กำลังรอเข้าใช้งาน (Waiting)</span>`
-                    : `<span class="status-badge status-paid">✅ ชำระเงินแล้ว (Paid)</span>`;
+                const isUpcoming = (item.check_in >= todayStr && item.payment_status !== 'Cancelled');
+                const isCancelled = (item.payment_status === 'Cancelled');
+                const isPaid = (item.payment_status === 'Paid' || item.payment_status === 'Paid_Card');
+
+                let statusBadge = '';
+                if (isCancelled) {
+                    statusBadge = `<span class="status-badge" style="background-color: #fee2e2; color: #dc2626; border: 1px solid #fecaca;">❌ ยกเลิกแล้ว (Cancelled)</span>`;
+                } else if (isUpcoming) {
+                    if (isPaid) {
+                        statusBadge = `<span class="status-badge status-paid">⏳ กำลังรอเข้าพัก (ชำระเงินแล้ว)</span>`;
+                    } else {
+                        statusBadge = `<span class="status-badge status-waiting">⏳ กำลังรอเข้าพัก (รอชำระเงิน)</span>`;
+                    }
+                } else {
+                    if (isPaid) {
+                        statusBadge = `<span class="status-badge" style="background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">🏨 เข้าพักเรียบร้อยแล้ว (Completed)</span>`;
+                    } else {
+                        statusBadge = `<span class="status-badge" style="background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">📋 สิ้นสุดระยะเวลาจอง</span>`;
+                    }
+                }
 
                 const checkInDate = new Date(item.check_in);
                 const checkOutDate = new Date(item.check_out);
@@ -276,6 +299,14 @@
                         </div>
                     </div>
                 ` : '';
+
+                const actionBtnHtml = isUpcoming ? `
+                    <div style="margin-top: 8px;">
+                        <button class="btn-cancel" onclick="cancelBooking(${item.booking_id})" style="background-color: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; font-family: inherit;">🗑️ ยกเลิกการจอง</button>
+                    </div>` : `
+                    <div style="margin-top: 8px;">
+                        <span style="font-size: 12px; color: #94a3b8;">${isCancelled ? 'รายการนี้ถูกยกเลิกแล้ว' : 'รายการนี้ผ่านวันเข้าพักแล้ว'}</span>
+                    </div>`;
 
                 html += `
                 <div class="booking-item-card">
@@ -317,9 +348,7 @@
                             <div class="booking-guest-info">
                                 👤 ผู้เข้าพัก: <strong>${item.cus_name || '-'}</strong> | 📞 ${item.phone || '-'}
                                 <br><small style="color: #94a3b8;">ทำรายการเมื่อ: ${bookingDateStr}</small>
-                                <div style="margin-top: 8px;">
-                                    <button class="btn-cancel" onclick="cancelBooking(${item.booking_id})" style="background-color: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; font-family: inherit;">🗑️ ยกเลิกการจอง</button>
-                                </div>
+                                ${actionBtnHtml}
                             </div>
                             <div class="booking-price-total">
                                 <span class="label">ยอดชำระสุทธิ:</span>
@@ -349,21 +378,11 @@
                     if (data.success) {
                         alert(data.message || 'ยกเลิกรายการจองสำเร็จ');
                         fetchBookings(currentStatusFilter);
-                        updateCounts();
                     } else {
                         alert('เกิดข้อผิดพลาด: ' + data.message);
                     }
                 })
                 .catch(() => alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'));
-        }
-
-        function updateCounts() {
-            fetch('../script/getMyBookings.php?status=Waiting')
-                .then(r => r.json())
-                .then(d => { if (d.success) document.getElementById('count-waiting').textContent = d.count; });
-            fetch('../script/getMyBookings.php?status=all')
-                .then(r => r.json())
-                .then(d => { if (d.success) document.getElementById('count-all').textContent = d.count; });
         }
 
         // โหลดข้อมูลเมื่อเปิดหน้าเว็บ
@@ -381,8 +400,7 @@
             document.getElementById('user-display-email').textContent = `${email ? '📧 ' + email : ''} ${phone ? ' | 📞 ' + phone : ''}`;
 
             updateNavAuth();
-            fetchBookings('Waiting');
-            updateCounts();
+            fetchBookings('upcoming');
         });
     </script>
 </body>
